@@ -110,6 +110,157 @@ class Hibi_Rest {
 				'permission_callback' => $auth,
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/entries',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'list_entries' ),
+				'permission_callback' => $auth,
+				'args'                => array(
+					'from'      => array(
+						'type'              => 'string',
+						'validate_callback' => array( __CLASS__, 'validate_optional_date' ),
+					),
+					'to'        => array(
+						'type'              => 'string',
+						'validate_callback' => array( __CLASS__, 'validate_optional_date' ),
+					),
+					'cursor'    => array(
+						'type'              => 'string',
+						'validate_callback' => array( __CLASS__, 'validate_optional_date' ),
+					),
+					'tag'       => array(
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'mood'      => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+						'maximum' => 5,
+					),
+					'has_photo' => array( 'type' => 'boolean' ),
+					'limit'     => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+						'maximum' => 50,
+						'default' => 20,
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/calendar',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_calendar' ),
+				'permission_callback' => $auth,
+				'args'                => array(
+					'year'  => array(
+						'type'     => 'integer',
+						'required' => true,
+						'minimum'  => 1900,
+						'maximum'  => 9999,
+					),
+					'month' => array(
+						'type'     => 'integer',
+						'required' => true,
+						'minimum'  => 1,
+						'maximum'  => 12,
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/year',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_year' ),
+				'permission_callback' => $auth,
+				'args'                => array(
+					'year' => array(
+						'type'     => 'integer',
+						'required' => true,
+						'minimum'  => 1900,
+						'maximum'  => 9999,
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/on-this-day',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_on_this_day' ),
+				'permission_callback' => $auth,
+				'args'                => array(
+					'date' => array(
+						'type'              => 'string',
+						'required'          => true,
+						'validate_callback' => array( __CLASS__, 'validate_date' ),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/search',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'search' ),
+				'permission_callback' => $auth,
+				'args'                => array(
+					'q'      => array(
+						'type'      => 'string',
+						'required'  => true,
+						'maxLength' => 200,
+					),
+					'cursor' => array(
+						'type'              => 'string',
+						'validate_callback' => array( __CLASS__, 'validate_optional_date' ),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/tags',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_tags' ),
+				'permission_callback' => $auth,
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/entries/(?P<date>\d{4}-\d{2}-\d{2})/photos',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( __CLASS__, 'upload_photo' ),
+				'permission_callback' => $auth,
+				'args'                => $date,
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/photos/(?P<id>\d+)',
+			array(
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => array( __CLASS__, 'delete_photo' ),
+				'permission_callback' => $auth,
+			)
+		);
 	}
 
 	/**
@@ -220,6 +371,107 @@ class Hibi_Rest {
 			return $result;
 		}
 		return self::no_store( rest_ensure_response( $result ) );
+	}
+
+	/**
+	 * @param mixed $value Optional date parameter.
+	 * @return bool
+	 */
+	public static function validate_optional_date( $value ) {
+		return '' === $value || null === $value || Hibi_Day::is_valid( $value );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function list_entries( WP_REST_Request $request ) {
+		return self::no_store(
+			rest_ensure_response(
+				Hibi_Query::timeline(
+					get_current_user_id(),
+					array(
+						'from'      => (string) $request['from'],
+						'to'        => (string) $request['to'],
+						'cursor'    => (string) $request['cursor'],
+						'tag'       => (string) $request['tag'],
+						'mood'      => (int) $request['mood'],
+						'has_photo' => (bool) $request['has_photo'],
+						'limit'     => (int) $request['limit'],
+					)
+				)
+			)
+		);
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function get_calendar( WP_REST_Request $request ) {
+		return self::no_store( rest_ensure_response( Hibi_Query::month( get_current_user_id(), (int) $request['year'], (int) $request['month'] ) ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function get_year( WP_REST_Request $request ) {
+		return self::no_store( rest_ensure_response( Hibi_Query::year( get_current_user_id(), (int) $request['year'] ) ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function get_on_this_day( WP_REST_Request $request ) {
+		return self::no_store( rest_ensure_response( Hibi_Query::on_this_day( get_current_user_id(), $request['date'] ) ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function search( WP_REST_Request $request ) {
+		return self::no_store( rest_ensure_response( Hibi_Search::search( get_current_user_id(), (string) $request['q'], (string) $request['cursor'] ) ) );
+	}
+
+	public static function get_tags() {
+		return self::no_store( rest_ensure_response( Hibi_Query::tags( get_current_user_id() ) ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function upload_photo( WP_REST_Request $request ) {
+		$files = $request->get_file_params();
+		if ( empty( $files['file'] ) || ! is_array( $files['file'] ) ) {
+			return new WP_Error( 'hibi_photo_upload', __( 'No photo was sent.', 'hibi-journal' ), array( 'status' => 400 ) );
+		}
+		$user_id = get_current_user_id();
+		if ( $request['date'] > Hibi_Day::shift( Hibi_Day::today( $user_id ), 1 ) ) {
+			return new WP_Error( 'hibi_future_date', __( 'You cannot write an entry for a future date.', 'hibi-journal' ), array( 'status' => 400 ) );
+		}
+		$photo = Hibi_Photos::upload( $user_id, $request['date'], $files['file'] );
+		if ( is_wp_error( $photo ) ) {
+			return $photo;
+		}
+		$response = rest_ensure_response( $photo );
+		$response->set_status( 201 );
+		return self::no_store( $response );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function delete_photo( WP_REST_Request $request ) {
+		$result = Hibi_Photos::delete( (int) $request['id'], get_current_user_id() );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		return self::no_store( rest_ensure_response( array( 'deleted' => true ) ) );
 	}
 
 	public static function get_settings() {

@@ -1,32 +1,5 @@
 import { expect, test, type Page, type Request } from '@playwright/test';
-import { php, wp } from './wp';
-
-interface ServerEntry {
-	exists: boolean;
-	content: string;
-	mood: number | null;
-	version: number;
-}
-
-const userId = () => Number( wp( 'user', 'get', 'hibi-e2e', '--field=ID' ) );
-
-function today(): string {
-	return php<string>( `echo wp_json_encode( Hibi_Day::today( ${ userId() } ) );` );
-}
-
-function serverEntry( date: string ): ServerEntry {
-	return php<ServerEntry>( `echo wp_json_encode( Hibi_Entries::get( ${ userId() }, '${ date }' ) );` );
-}
-
-function writeOnServer( date: string, content: string ): void {
-	php( `$e = Hibi_Entries::get( ${ userId() }, '${ date }' ); Hibi_Entries::save( ${ userId() }, '${ date }', array( 'base_version' => $e['version'], 'content' => ${ JSON.stringify( content ) } ) ); echo '1';` );
-}
-
-function clearEntries(): void {
-	php(
-		`foreach ( get_posts( array( 'post_type' => 'hibi_entry', 'post_status' => 'any', 'author' => ${ userId() }, 'posts_per_page' => -1, 'fields' => 'ids' ) ) as $id ) { wp_delete_post( $id, true ); } echo '1';`
-	);
-}
+import { clearEntries, serverEntry, today, writeOnServer } from './entries';
 
 const isEntryPut = ( r: Request ) => r.method() === 'PUT' && /hibi\/v1\/entries\//.test( decodeURIComponent( r.url() ) );
 
@@ -130,6 +103,9 @@ test( 'previous and next day', async ( { page }, info ) => {
 	}
 	await expect( page ).toHaveURL( new RegExp( `/d/${ yesterday }/$` ) );
 	await expect( page.getByRole( 'link', { name: '今日へ' } ) ).toBeVisible();
+	// A past day opens for reading; writing starts from the button.
+	await expect( page.getByLabel( '本文' ) ).toHaveCount( 0 );
+	await page.getByRole( 'button', { name: 'この日のことを書く' } ).click();
 	await expect( await body( page ) ).toHaveAttribute( 'placeholder', 'この日のことを書く' );
 
 	await page.getByRole( 'link', { name: '次の日' } ).click();
@@ -160,9 +136,16 @@ test( 'a conflict keeps both versions until the writer chooses', async ( { page 
 test( 'the shell embeds the entry so the first paint needs no API call', async ( { page } ) => {
 	writeOnServer( today(), '埋め込み済み' );
 	const apiCalls: string[] = [];
-	page.on( 'request', ( r ) => /hibi\/v1/.test( decodeURIComponent( r.url() ) ) && apiCalls.push( r.url() ) );
+	page.on( 'request', ( r ) => {
+		const url = decodeURIComponent( r.url() );
+		// "On this day" loads after the editor is up, on purpose.
+		if ( /hibi\/v1/.test( url ) && ! /on-this-day/.test( url ) ) {
+			apiCalls.push( url );
+		}
+	} );
 
 	await page.goto( '/' );
 	await expect( await body( page ) ).toHaveValue( '埋め込み済み' );
+	await page.waitForLoadState( 'networkidle' );
 	expect( apiCalls ).toHaveLength( 0 );
 } );

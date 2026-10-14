@@ -70,6 +70,7 @@ class Hibi_Entries {
 				'weather'    => null,
 				'location'   => null,
 				'char_count' => 0,
+				'photos'     => array(),
 				'version'    => 0,
 				'updated_at' => null,
 			);
@@ -101,6 +102,51 @@ class Hibi_Entries {
 
 		try {
 			return self::save_locked( $user_id, $date, $fields );
+		} finally {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- See above.
+			$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
+		}
+	}
+
+	/**
+	 * The entry's post ID, creating an empty entry if there is none yet,
+	 * e.g. when a photo is added before any text. The new entry has
+	 * version 0, so a client that has not saved yet stays in step.
+	 *
+	 * @param int    $user_id User ID.
+	 * @param string $date    YYYY-MM-DD.
+	 * @return int|WP_Error
+	 */
+	public static function ensure( $user_id, $date ) {
+		global $wpdb;
+
+		$lock = 'hibi_entry_' . (int) $user_id . '_' . $date;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Named locks have no WordPress API.
+		if ( 1 !== (int) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 10)', $lock ) ) ) {
+			return new WP_Error( 'hibi_busy', __( 'The entry is being saved from another request. Please try again.', 'hibi-journal' ), array( 'status' => 503 ) );
+		}
+		try {
+			$post = self::find( $user_id, $date );
+			if ( $post ) {
+				return $post->ID;
+			}
+			$postarr = array(
+				'post_type'    => Hibi_Entry_Type::POST_TYPE,
+				'post_status'  => 'private',
+				'post_author'  => (int) $user_id,
+				'post_title'   => $date,
+				'post_content' => '',
+			);
+			list( $postarr['post_date'], $postarr['post_date_gmt'] ) = Hibi_Day::noon( $date );
+			$post_id = wp_insert_post( $postarr, true );
+			if ( is_wp_error( $post_id ) ) {
+				return $post_id;
+			}
+			update_post_meta( $post_id, '_hibi_date', $date );
+			update_post_meta( $post_id, '_hibi_version', 0 );
+			update_post_meta( $post_id, '_hibi_char_count', 0 );
+			update_post_meta( $post_id, '_hibi_updated_at', time() );
+			return $post_id;
 		} finally {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- See above.
 			$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
@@ -266,8 +312,9 @@ class Hibi_Entries {
 	 * @return array
 	 */
 	public static function to_array( WP_Post $post ) {
-		$mood  = get_post_meta( $post->ID, '_hibi_mood', true );
-		$terms = wp_get_object_terms( $post->ID, Hibi_Entry_Type::TAXONOMY, array( 'fields' => 'names' ) );
+		$mood   = get_post_meta( $post->ID, '_hibi_mood', true );
+		$terms  = wp_get_object_terms( $post->ID, Hibi_Entry_Type::TAXONOMY, array( 'fields' => 'names' ) );
+		$photos = Hibi_Photos::for_entries( array( $post->ID ) );
 
 		return array(
 			'date'       => (string) get_post_meta( $post->ID, '_hibi_date', true ),
@@ -278,6 +325,7 @@ class Hibi_Entries {
 			'weather'    => self::decode_json_meta( $post->ID, '_hibi_weather' ),
 			'location'   => self::decode_json_meta( $post->ID, '_hibi_location' ),
 			'char_count' => (int) get_post_meta( $post->ID, '_hibi_char_count', true ),
+			'photos'     => isset( $photos[ $post->ID ] ) ? $photos[ $post->ID ] : array(),
 			'version'    => (int) get_post_meta( $post->ID, '_hibi_version', true ),
 			'updated_at' => self::updated_at( $post ),
 		);

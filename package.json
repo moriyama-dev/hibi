@@ -17,6 +17,8 @@
 	},
 	"dependencies": {
 		"@preact/signals": "^2.11.3",
+		"dompurify": "^3.4.17",
+		"marked": "^16.4.2",
 		"preact": "^10.29.8"
 	},
 	"private": true

@@ -4,9 +4,13 @@ import { dayLabel, shiftDate, timeStamp, yearLabel } from '../date';
 import { beforeNavigate, dayHref, navigate } from '../router';
 import { EntrySaver } from '../saver';
 import { boot, entryCache, stats, today } from '../store';
-import type { Entry, Mood } from '../types';
+import type { Entry, Mood, Photo } from '../types';
 import { ConflictBanner } from './ConflictBanner';
+import { OnThisDayCard } from './OnThisDay';
+import { PhotoButton, PhotoStrip } from './Photos';
+import { ReadView } from './ReadView';
 import { SaveStatus } from './SaveStatus';
+import { TagEditor } from './TagEditor';
 
 const MOODS: { value: Mood; label: string }[] = [
 	{ value: 1, label: 'とても悪い' },
@@ -26,6 +30,10 @@ interface Props {
 export function DayView( { date, isToday }: Props ) {
 	const [ entry, setEntry ] = useState<Entry | null>( () => entryCache.get( date ) ?? null );
 	const [ loadError, setLoadError ] = useState( false );
+	// Past days open for reading, so leafing through cannot change them by accident.
+	const [ editing, setEditing ] = useState( isToday );
+
+	useEffect( () => setEditing( isToday ), [ date, isToday ] );
 
 	useEffect( () => {
 		const cached = entryCache.get( date );
@@ -51,9 +59,19 @@ export function DayView( { date, isToday }: Props ) {
 	return (
 		<div class="day">
 			<DayHeader date={ date } isToday={ isToday } />
-			{ entry ? (
-				<Editor key={ date } entry={ entry } isToday={ isToday } />
-			) : (
+			{ entry && editing && <Editor key={ date } entry={ entry } isToday={ isToday } /> }
+			{ entry && ! editing && (
+				<div class="reading">
+					{ entry.mood && <p class="read-mood">気分：{ MOODS[ entry.mood - 1 ].label }</p> }
+					<ReadView entry={ entry } />
+					<PhotoStrip date={ date } photos={ entry.photos } editable={ false } onChange={ () => undefined } />
+					{ entry.tags.length > 0 && <p class="read-tags">{ entry.tags.map( ( t ) => `#${ t }` ).join( ' ' ) }</p> }
+					<button type="button" class="edit-button" onClick={ () => setEditing( true ) }>
+						{ entry.exists ? '編集する' : 'この日のことを書く' }
+					</button>
+				</div>
+			) }
+			{ ! entry && (
 				<p class="day-loading" role="status">
 					{ loadError ? '読み込めませんでした。通信状態を確認してください。' : '読み込み中…' }
 				</p>
@@ -107,6 +125,9 @@ function Editor( { entry, isToday }: EditorProps ) {
 	const textarea = useRef<HTMLTextAreaElement>( null );
 	const [ mood, setMood ] = useState<Mood | null>( entry.mood );
 	const [ chars, setChars ] = useState( entry.char_count );
+	const [ tags, setTags ] = useState<string[]>( entry.tags );
+	const [ showTags, setShowTags ] = useState( entry.tags.length > 0 );
+	const [ photos, setPhotos ] = useState<Photo[]>( entry.photos );
 
 	const saver = useMemo(
 		() =>
@@ -231,6 +252,20 @@ function Editor( { entry, isToday }: EditorProps ) {
 		afterProgrammaticEdit( el );
 	};
 
+	const changeTags = ( next: string[] ) => {
+		setTags( next );
+		saver.change( { tags: next } );
+		saver.flush();
+	};
+
+	const changePhotos = ( next: Photo[] ) => {
+		setPhotos( next );
+		const cached = entryCache.get( entry.date );
+		if ( cached ) {
+			entryCache.set( entry.date, { ...cached, exists: true, photos: next } );
+		}
+	};
+
 	const toggleMood = ( value: Mood ) => {
 		const next = mood === value ? null : value;
 		setMood( next );
@@ -249,11 +284,12 @@ function Editor( { entry, isToday }: EditorProps ) {
 		if ( choice === 'theirs' ) {
 			el.value = theirs;
 			setMood( conflict.server.mood );
+			setTags( conflict.server.tags );
 			saver.resolve( null );
 		} else {
 			const content = choice === 'both' ? joinVersions( theirs, mine ) : mine;
 			el.value = content;
-			saver.resolve( { ...conflict.mine, content, mood } );
+			saver.resolve( { ...conflict.mine, content, mood, tags } );
 		}
 		afterResolve( el );
 	};
@@ -295,9 +331,17 @@ function Editor( { entry, isToday }: EditorProps ) {
 				onKeyDown={ onKeyDown }
 			/>
 
+			{ showTags && <TagEditor tags={ tags } onChange={ changeTags } /> }
+			<PhotoStrip date={ entry.date } photos={ photos } editable onChange={ changePhotos } />
+			{ isToday && <OnThisDayCard date={ entry.date } /> }
+
 			<div class="toolbar" role="toolbar" aria-label="書く道具">
+				<PhotoButton date={ entry.date } onAdded={ ( photo ) => changePhotos( [ ...photos, photo ] ) } />
 				<button type="button" class="tool" onClick={ insertTime } onMouseDown={ ( e ) => e.preventDefault() }>
 					時刻
+				</button>
+				<button type="button" class="tool" aria-pressed={ showTags } onClick={ () => setShowTags( ! showTags ) }>
+					タグ
 				</button>
 				<span class="chars" aria-label={ `${ chars }文字` }>
 					{ chars.toLocaleString( 'ja-JP' ) }字

@@ -1,12 +1,21 @@
 {
   "src/main.tsx": {
-    "file": "assets/main-FhQl9V6y.js",
+    "file": "assets/main-C3lGdhFu.js",
     "name": "main",
     "src": "src/main.tsx",
-    "isEntry": true
+    "isEntry": true,
+    "dynamicImports": [
+      "src/markdown.ts"
+    ]
+  },
+  "src/markdown.ts": {
+    "file": "assets/markdown-OxVRqVme.js",
+    "name": "markdown",
+    "src": "src/markdown.ts",
+    "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-rhnjNsrI.css",
+    "file": "assets/style-CMjD31M-.css",
     "src": "style.css"
   }
 }

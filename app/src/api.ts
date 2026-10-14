@@ -1,4 +1,4 @@
-import type { Bootstrap, Entry, EntryFields, Settings, Stats } from './types';
+import type { Bootstrap, Card, Entry, EntryFields, MonthDay, Page, Photo, SearchItem, Settings, Stats } from './types';
 
 export class ApiError extends Error {
 	constructor(
@@ -51,6 +51,7 @@ function goToLogin(): void {
 interface RequestOptions {
 	keepalive?: boolean;
 	retried?: boolean;
+	signal?: AbortSignal;
 }
 
 async function request<T>( method: string, path: string, body?: unknown, options: RequestOptions = {} ): Promise<T> {
@@ -59,11 +60,12 @@ async function request<T>( method: string, path: string, body?: unknown, options
 		credentials: 'same-origin',
 		cache: 'no-store',
 		keepalive: options.keepalive,
+		signal: options.signal,
 		headers: {
 			'X-WP-Nonce': nonce,
-			...( body === undefined ? {} : { 'Content-Type': 'application/json' } ),
+			...( body === undefined || body instanceof FormData ? {} : { 'Content-Type': 'application/json' } ),
 		},
-		body: body === undefined ? undefined : JSON.stringify( body ),
+		body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify( body ),
 	} );
 
 	if ( res.ok ) {
@@ -95,6 +97,41 @@ export const api = {
 	},
 
 	getStats: () => request<Stats>( 'GET', 'stats' ),
+
+	listEntries( filters: { cursor?: string; tag?: string; mood?: number; has_photo?: boolean; limit?: number } ) {
+		const q = new URLSearchParams();
+		for ( const [ k, v ] of Object.entries( filters ) ) {
+			if ( v !== undefined && v !== '' && v !== false && v !== 0 ) {
+				q.set( k, String( v ) );
+			}
+		}
+		return request<Page<Card>>( 'GET', `entries?${ q }` );
+	},
+
+	calendar: ( year: number, month: number ) =>
+		request<{ year: number; month: number; days: Record<string, MonthDay> }>( 'GET', `calendar?year=${ year }&month=${ month }` ),
+
+	year: ( year: number ) => request<{ year: number; days: Record<string, [ number, number | null ]> }>( 'GET', `year?year=${ year }` ),
+
+	onThisDay: ( date: string ) => request<{ date: string; items: Card[] }>( 'GET', `on-this-day?date=${ date }` ),
+
+	search: ( q: string, cursor: string | null, signal?: AbortSignal ) =>
+		request<Page<SearchItem> & { terms: string[] }>(
+			'GET',
+			`search?q=${ encodeURIComponent( q ) }${ cursor ? `&cursor=${ cursor }` : '' }`,
+			undefined,
+			{ signal }
+		),
+
+	tags: () => request<{ name: string; count: number }[]>( 'GET', 'tags' ),
+
+	uploadPhoto( date: string, file: Blob, name: string ) {
+		const form = new FormData();
+		form.append( 'file', file, name );
+		return request<Photo>( 'POST', `entries/${ date }/photos`, form );
+	},
+
+	deletePhoto: ( id: number ) => request<{ deleted: boolean }>( 'DELETE', `photos/${ id }` ),
 
 	putSettings: ( changes: Partial<Settings> ) => request<Settings>( 'PUT', 'settings', changes ),
 };

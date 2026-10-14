@@ -1,21 +1,31 @@
 import { useEffect } from 'preact/hooks';
-import { route } from '../router';
+import { href, navigate, route } from '../router';
 import { refreshToday, settings } from '../store';
+import { CalendarView } from './CalendarView';
 import { DayView, useDayShortcuts } from './DayView';
 import { Nav } from './Nav';
+import { OnThisDayView } from './OnThisDay';
 import { Pending } from './Pending';
-
-const TITLES = {
-	calendar: '振り返り',
-	timeline: 'タイムライン',
-	search: '検索',
-	'on-this-day': '1年前の今日',
-	settings: '設定',
-} as const;
+import { SearchView } from './SearchView';
+import { TimelineView } from './TimelineView';
 
 export function App() {
 	const r = route.value;
 	useDayShortcuts( r.name === 'day' ? r.date : null );
+
+	// Ctrl/Cmd+K opens search from anywhere.
+	useEffect( () => {
+		const onKey = ( event: KeyboardEvent ) => {
+			if ( ( event.metaKey || event.ctrlKey ) && ! event.altKey && event.key.toLowerCase() === 'k' ) {
+				event.preventDefault();
+				if ( route.value.name !== 'search' ) {
+					navigate( href( '/search' ) );
+				}
+			}
+		};
+		window.addEventListener( 'keydown', onKey );
+		return () => window.removeEventListener( 'keydown', onKey );
+	}, [] );
 
 	// When the app comes back after the day boundary, move "today" forward.
 	useEffect( () => {
@@ -45,7 +55,11 @@ export function App() {
 			<Nav />
 			<main class="main" id="main">
 				{ r.name === 'day' && <DayView key={ r.date } date={ r.date } isToday={ r.isToday } /> }
-				{ r.name in TITLES && <Pending title={ TITLES[ r.name as keyof typeof TITLES ] } /> }
+				{ r.name === 'calendar' && <CalendarView /> }
+				{ r.name === 'timeline' && <TimelineView /> }
+				{ r.name === 'on-this-day' && <OnThisDayView /> }
+				{ r.name === 'search' && <SearchView /> }
+				{ r.name === 'settings' && <Pending title="設定" /> }
 				{ r.name === 'not-found' && <Pending title="ページが見つかりません" /> }
 			</main>
 		</div>

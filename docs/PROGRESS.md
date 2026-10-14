@@ -109,3 +109,37 @@ All times are America/Toronto.
 ### Open items
 
 - Takumi PWA is active on the same site and prints its manifest, icons, script and stylesheet into the Hibi shell. This conflicts with the Hibi service worker planned for phase 4.
+
+## Phase 3 — Looking back (2026-10-14)
+
+### Done
+
+- Reading view for past days: Markdown via marked and DOMPurify, loaded on demand (24.5 KB gzip, not part of the first load). `&` and `<` are escaped before parsing, so typed HTML shows as text and a line starting with `<` cannot swallow the lines after it. Only the entry's own photos (`hibi-photo:<id>`) render as images; links open in a new tab with `noopener noreferrer`.
+- Past days open for reading; "Edit" switches to the editor.
+- Calendar (month grid: dot colour is the mood, size is the length), month totals, year heat map.
+- Timeline with infinite scroll and filters (tag, mood, has photo).
+- Search: every term must match (space or full-width space separates terms), results highlighted from server-side segments, 300 ms debounce, query kept in the URL, Ctrl/Cmd+K from anywhere. On MySQL 8 the comparison uses `utf8mb4_0900_as_ci`: hiragana finds katakana and case is ignored, but は and ば stay different. Elsewhere the column collation is used.
+- On this day: a card on today's page (loaded after the editor is ready) and a full page.
+- Tags: editor with suggestions from the writer's own tags (`GET tags`).
+- Photos: resized to 2560 px and re-encoded in the browser; on the server re-encoded again with Imagick (orientation applied, metadata stripped, sizes 2560/1200/400) or GD as a fallback. Stored in `uploads/hibi-private/{user}/{YYYY}/{MM}/` under unguessable names, with `.htaccess` (`Require all denied` and `Deny from all`) and `index.php`. Served by `?hibi_photo=<id>&size=` after a login and ownership check (`Cache-Control: private, max-age=31536000, immutable`). Not a REST route: an `<img>` request carries the cookie but no REST nonce. Hidden from the media library. Deleting an entry deletes its photos.
+- REST: `entries` (list), `calendar`, `year`, `on-this-day`, `search`, `tags`, `entries/{date}/photos` (POST), `photos/{id}` (DELETE).
+
+### Measurements (2,536 entries over 3,000 days, HTTP on the VM)
+
+| Request | Time |
+|---|---|
+| `search?q=コーヒー` | 25 ms |
+| `search?q=こーひー` (finds コーヒー) | 26 ms |
+| `search` with no match | 14 ms |
+| `entries?limit=20` | 44 ms |
+| `entries?tag=子供` | 19 ms |
+| `calendar` | 12 ms |
+| `year` | 15 ms |
+| `on-this-day` | 13 ms |
+
+First load: JS 19.7 KB + CSS 3.4 KB gzip.
+
+### Tests
+
+- PHPUnit: 67 tests pass (photos: GPS removed, orientation applied, capture time kept, size caps, owner-only delete, entry deletion; queries; search terms, highlighting, kana, voiced kana, LIKE wildcards, paging; per-author isolation).
+- Playwright: 30 of 30 pass on desktop and mobile. New: reading view and escaping, calendar, timeline filter, search with Ctrl/Cmd+K, on this day, photo upload (GPS gone, 401 logged out, 403 for the file URL, delete), tags.

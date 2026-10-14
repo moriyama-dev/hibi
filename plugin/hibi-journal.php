@@ -28,11 +28,15 @@ require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-day.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-entry-type.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-entries.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-stats.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-photos.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-query.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-search.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-rest.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-login.php';
 
 Hibi_Entry_Type::init();
 Hibi_Entries::init();
+Hibi_Photos::init();
 Hibi_Rest::init();
 Hibi_Login::init();
 

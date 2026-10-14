@@ -8,6 +8,43 @@ export interface Weather {
 	source: string;
 }
 
+export interface Photo {
+	id: number;
+	width: number;
+	height: number;
+	taken_at: string;
+	thumb: string;
+	medium: string;
+	full: string;
+}
+
+export interface Card {
+	date: string;
+	mood: Mood | null;
+	chars: number;
+	excerpt: string;
+	tags: string[];
+	photos: Photo[];
+}
+
+export interface Page<T> {
+	items: T[];
+	next_cursor: string | null;
+}
+
+export interface SearchItem {
+	date: string;
+	mood: Mood | null;
+	segments: [ string, boolean ][];
+}
+
+export interface MonthDay {
+	mood: Mood | null;
+	level: number;
+	chars: number;
+	photos: number;
+}
+
 export interface Entry {
 	date: string;
 	exists: boolean;
@@ -17,6 +54,7 @@ export interface Entry {
 	weather: Weather | null;
 	location: { lat: number; lng: number; label: string } | null;
 	char_count: number;
+	photos: Photo[];
 	version: number;
 	updated_at: string | null;
 }
