@@ -135,6 +135,27 @@ function Editor( { entry, isToday }: EditorProps ) {
 		}
 	}, [ entry.date ] );
 
+	// Registered directly: Preact maps onCompositionEnd to a "CompositionEnd"
+	// event, because browsers have no oncompositionend property to detect.
+	useEffect( () => {
+		const el = textarea.current;
+		if ( ! el ) {
+			return;
+		}
+		const onStart = () => saver.setComposing( true );
+		const onEnd = () => {
+			saver.setComposing( false );
+			setChars( countChars( el.value ) );
+			saver.change( { content: el.value } );
+		};
+		el.addEventListener( 'compositionstart', onStart );
+		el.addEventListener( 'compositionend', onEnd );
+		return () => {
+			el.removeEventListener( 'compositionstart', onStart );
+			el.removeEventListener( 'compositionend', onEnd );
+		};
+	}, [ saver ] );
+
 	useEffect( () => {
 		const onHide = () => {
 			if ( document.visibilityState === 'hidden' ) {
@@ -171,14 +192,6 @@ function Editor( { entry, isToday }: EditorProps ) {
 		if ( ( event as InputEvent ).isComposing ) {
 			return;
 		}
-		setChars( countChars( el.value ) );
-		saver.change( { content: el.value } );
-	};
-
-	const onCompositionStart = () => saver.setComposing( true );
-	const onCompositionEnd = ( event: CompositionEvent ) => {
-		const el = event.currentTarget as HTMLTextAreaElement;
-		saver.setComposing( false );
 		setChars( countChars( el.value ) );
 		saver.change( { content: el.value } );
 	};
@@ -279,8 +292,6 @@ function Editor( { entry, isToday }: EditorProps ) {
 				autocomplete="off"
 				spellcheck={ false }
 				onInput={ onInput }
-				onCompositionStart={ onCompositionStart }
-				onCompositionEnd={ onCompositionEnd }
 				onKeyDown={ onKeyDown }
 			/>
 

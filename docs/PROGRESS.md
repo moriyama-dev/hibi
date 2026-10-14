@@ -35,7 +35,7 @@ All times are America/Toronto.
 - Install composer and the PHP extensions gmp (or bcmath) and imagick. These need root.
 - Takumi PWA (separate project) also registers a service worker. Both must not be active on the same site.
 
-## Phase 1 — Plugin foundation (2026-10-14, in progress)
+## Phase 1 — Plugin foundation (2026-10-14)
 
 ### Done
 
@@ -73,5 +73,39 @@ All times are America/Toronto.
 
 ### Open items
 
-- The PHPUnit run needs a separate test database (`wp_hibi_test`).
+- PHPUnit: 44 tests pass against the separate test database `wp_hibi_test`.
 - The site uses plain permalinks and Apache has `AllowOverride None`, so `/wp-json/` and `.htaccess` files do not work on the VM. This affects the app URLs (`/d/YYYY-MM-DD`) and the photo folder protection.
+
+## Phase 2 — Today screen (2026-10-14)
+
+### Done
+
+- Theme `hibi` (classic theme) serves one shell for `/`, `/d/YYYY-MM-DD/`, `/calendar/`, `/timeline/`, `/search/`, `/on-this-day/` and `/settings/`; other URLs get the shell with a 404 status. Block styles and emoji scripts are dropped from the shell.
+- The shell embeds the bootstrap data (including today's entry), so the first paint makes no API call.
+- Front end: TypeScript, Preact, Preact signals, Vite. Built files are committed in `theme/assets/dist` (JS 14.2 KB gzip, CSS 1.9 KB gzip).
+- Editor: an uncontrolled, self-sizing textarea. Autosave 1.5 s after typing stops and at least every 10 s; an immediate keepalive save on `visibilitychange` (hidden), `pagehide` and in-app navigation.
+- IME: no autosave, character count or value change between `compositionstart` and `compositionend`. These listeners are registered with `addEventListener`, because Preact would bind `onCompositionEnd` to an event named "CompositionEnd".
+- Mood (five buttons, tap again to clear), time stamp insertion, character count, Ctrl/Cmd+B and +I, previous and next day (buttons, Alt+Left/Right, horizontal swipe).
+- Conflict banner: keep this device's text, keep the other, or join both. Saving pauses until a choice is made; nothing is discarded.
+- Save status with `aria-live`: saved, waiting, saving, offline, error, conflict. Failed saves retry with backoff and on `online`.
+- Toolbar follows the on-screen keyboard through `visualViewport`; bottom tabs hide while the keyboard is open. Left sidebar from 900 px.
+- Login (only while the active theme declares `hibi-app`): redirect to `/` after login unless a specific page was requested, no admin bar on the front end, "Remember me" ticked by default and kept for one year.
+
+### Site changes
+
+- Permalinks set to `/%postname%/`; Apache `AllowOverride All` for `/var/www/` (previous config kept as `/etc/apache2/apache2.conf.bak-20261014`).
+- Active theme switched to `hibi`. Switch back with `wp theme activate takumi-web-services`.
+
+### Tests
+
+- Playwright, desktop and mobile (Pixel 7) projects: 16 of 16 pass. Covers reload persistence, IME composition, mood, time stamp, save on leaving, day navigation, conflict resolution and the embedded first paint. The tests use a dedicated user `hibi-e2e`, deleted afterwards.
+- Login over HTTP: redirect to `/`, `wordpress_logged_in` cookie expires in one year, "Remember me" pre-ticked.
+
+### Packages installed
+
+- Dev: vite 6, typescript 5, @preact/preset-vite 2, @playwright/test 1 (Chromium headless shell and its system libraries).
+- Runtime (bundled): preact 10, @preact/signals 2.
+
+### Open items
+
+- Takumi PWA is active on the same site and prints its manifest, icons, script and stylesheet into the Hibi shell. This conflicts with the Hibi service worker planned for phase 4.
