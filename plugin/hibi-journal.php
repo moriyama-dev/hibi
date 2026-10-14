@@ -29,10 +29,12 @@ require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-entry-type.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-entries.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-stats.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-rest.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-login.php';
 
 Hibi_Entry_Type::init();
 Hibi_Entries::init();
 Hibi_Rest::init();
+Hibi_Login::init();
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-cli.php';

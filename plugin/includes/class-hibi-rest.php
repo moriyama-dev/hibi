@@ -173,6 +173,8 @@ class Hibi_Rest {
 			'api'      => array(
 				'root'      => esc_url_raw( rest_url( self::NAMESPACE_V1 . '/' ) ),
 				'nonce_url' => esc_url_raw( add_query_arg( 'action', 'hibi_nonce', admin_url( 'admin-ajax.php' ) ) ),
+				'login_url' => esc_url_raw( wp_login_url() ),
+				'home_path' => (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ),
 			),
 		);
 	}
