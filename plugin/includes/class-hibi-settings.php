@@ -22,6 +22,9 @@ class Hibi_Settings {
 			'reminder_enabled' => false,
 			'reminder_time'    => '21:00',
 			'weather_enabled'  => true,
+			'weather_lat'      => null,
+			'weather_lng'      => null,
+			'weather_place'    => '',
 			'location_enabled' => false,
 			'prompts_enabled'  => true,
 			'font_size'        => 'M',
@@ -74,6 +77,17 @@ class Hibi_Settings {
 		foreach ( array( 'reminder_enabled', 'weather_enabled', 'location_enabled', 'prompts_enabled' ) as $key ) {
 			$out[ $key ] = isset( $input[ $key ] ) ? rest_sanitize_boolean( $input[ $key ] ) : $defaults[ $key ];
 		}
+
+		// The place used for the weather. Rounded: a neighbourhood is enough.
+		$lat = isset( $input['weather_lat'] ) && is_numeric( $input['weather_lat'] ) ? round( (float) $input['weather_lat'], 2 ) : null;
+		$lng = isset( $input['weather_lng'] ) && is_numeric( $input['weather_lng'] ) ? round( (float) $input['weather_lng'], 2 ) : null;
+		if ( null === $lat || null === $lng || $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180 ) {
+			$lat = null;
+			$lng = null;
+		}
+		$out['weather_lat']   = $lat;
+		$out['weather_lng']   = $lng;
+		$out['weather_place'] = isset( $input['weather_place'] ) ? mb_substr( sanitize_text_field( (string) $input['weather_place'] ), 0, 60 ) : '';
 
 		$time                 = isset( $input['reminder_time'] ) ? (string) $input['reminder_time'] : '';
 		$out['reminder_time'] = preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $time ) ? $time : $defaults['reminder_time'];

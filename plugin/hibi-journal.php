@@ -31,14 +31,20 @@ require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-stats.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-photos.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-query.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-search.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-weather.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-push.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-rest.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-login.php';
 
 Hibi_Entry_Type::init();
 Hibi_Entries::init();
 Hibi_Photos::init();
+Hibi_Push::init();
 Hibi_Rest::init();
 Hibi_Login::init();
+
+register_activation_hook( __FILE__, array( 'Hibi_Push', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Hibi_Push', 'deactivate' ) );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-cli.php';

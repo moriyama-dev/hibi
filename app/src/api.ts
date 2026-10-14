@@ -1,4 +1,4 @@
-import type { Bootstrap, Card, Entry, EntryFields, MonthDay, Page, Photo, SearchItem, Settings, Stats } from './types';
+import type { Bootstrap, Card, Entry, EntryFields, MonthDay, Page, Photo, Place, SearchItem, Settings, Stats, Weather } from './types';
 
 export class ApiError extends Error {
 	constructor(
@@ -134,4 +134,14 @@ export const api = {
 	deletePhoto: ( id: number ) => request<{ deleted: boolean }>( 'DELETE', `photos/${ id }` ),
 
 	putSettings: ( changes: Partial<Settings> ) => request<Settings>( 'PUT', 'settings', changes ),
+
+	weather: ( lat: number, lng: number, date: string ) => request<Weather>( 'GET', `weather?lat=${ lat }&lng=${ lng }&date=${ date }` ),
+
+	places: ( q: string ) => request<Place[]>( 'GET', `places?q=${ encodeURIComponent( q ) }` ),
+
+	pushSubscribe: ( sub: PushSubscriptionJSON ) => request<{ subscribed: boolean }>( 'POST', 'push/subscribe', sub ),
+
+	pushUnsubscribe: ( endpoint: string ) => request<{ subscribed: boolean }>( 'DELETE', 'push/subscribe', { endpoint } ),
+
+	pushTest: () => request<{ sent: number; failed: number; removed: number }>( 'POST', 'push/test' ),
 };

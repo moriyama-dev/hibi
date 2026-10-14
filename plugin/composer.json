@@ -1,0 +1,14 @@
+{
+    "name": "moriyama-dev/hibi-journal",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "minishlink/web-push": "^9"
+    },
+    "config": {
+        "platform": {
+            "php": "8.1"
+        },
+        "optimize-autoloader": true
+    }
+}

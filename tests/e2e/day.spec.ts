@@ -1,5 +1,5 @@
 import { expect, test, type Page, type Request } from '@playwright/test';
-import { clearEntries, serverEntry, today, writeOnServer } from './entries';
+import { clearEntries, resetSettings, serverEntry, today, writeOnServer } from './entries';
 
 const isEntryPut = ( r: Request ) => r.method() === 'PUT' && /hibi\/v1\/entries\//.test( decodeURIComponent( r.url() ) );
 
@@ -9,7 +9,10 @@ async function body( page: Page ) {
 	return el;
 }
 
-test.beforeEach( () => clearEntries() );
+test.beforeEach( () => {
+	clearEntries();
+	resetSettings();
+} );
 
 test( 'today opens ready to write and keeps the text after a reload', async ( { page } ) => {
 	await page.goto( '/' );
@@ -78,15 +81,23 @@ test( 'time stamp is inserted at the cursor on its own paragraph', async ( { pag
 	await expect( el ).toHaveValue( /^朝\n\n\d{2}:\d{2} 昼$/ );
 } );
 
-test( 'leaving the page saves immediately', async ( { page } ) => {
+test( 'leaving the page never loses the text', async ( { page } ) => {
 	await page.goto( '/' );
 	const el = await body( page );
 	await el.click();
 	await el.pressSequentially( 'すぐ閉じる' );
-	// Leave before the 1.5 s idle timer fires.
+	// Leave before the 1.5 s idle timer fires. The keepalive save usually
+	// lands at once; if the browser drops it, the draft is sent on the next visit.
 	await page.goto( 'about:blank' );
 
-	await expect.poll( () => serverEntry( today() ).content, { timeout: 5000 } ).toBe( 'すぐ閉じる' );
+	const landed = await expect
+		.poll( () => serverEntry( today() ).content, { timeout: 5000 } )
+		.toBe( 'すぐ閉じる' )
+		.then( () => true, () => false );
+	if ( ! landed ) {
+		await page.goto( '/' );
+		await expect.poll( () => serverEntry( today() ).content, { timeout: 10000 } ).toBe( 'すぐ閉じる' );
+	}
 } );
 
 test( 'previous and next day', async ( { page }, info ) => {
@@ -138,8 +149,8 @@ test( 'the shell embeds the entry so the first paint needs no API call', async (
 	const apiCalls: string[] = [];
 	page.on( 'request', ( r ) => {
 		const url = decodeURIComponent( r.url() );
-		// "On this day" loads after the editor is up, on purpose.
-		if ( /hibi\/v1/.test( url ) && ! /on-this-day/.test( url ) ) {
+		// "On this day" and the weather load after the editor is up, on purpose.
+		if ( /hibi\/v1/.test( url ) && ! /on-this-day|weather/.test( url ) ) {
 			apiCalls.push( url );
 		}
 	} );

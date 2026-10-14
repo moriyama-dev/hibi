@@ -261,6 +261,79 @@ class Hibi_Rest {
 				'permission_callback' => $auth,
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/weather',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_weather' ),
+				'permission_callback' => $auth,
+				'args'                => array(
+					'lat'  => array(
+						'type'     => 'number',
+						'required' => true,
+						'minimum'  => -90,
+						'maximum'  => 90,
+					),
+					'lng'  => array(
+						'type'     => 'number',
+						'required' => true,
+						'minimum'  => -180,
+						'maximum'  => 180,
+					),
+					'date' => array(
+						'type'              => 'string',
+						'required'          => true,
+						'validate_callback' => array( __CLASS__, 'validate_date' ),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/places',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_places' ),
+				'permission_callback' => $auth,
+				'args'                => array(
+					'q' => array(
+						'type'      => 'string',
+						'required'  => true,
+						'maxLength' => 80,
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/push/subscribe',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( __CLASS__, 'push_subscribe' ),
+					'permission_callback' => $auth,
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( __CLASS__, 'push_unsubscribe' ),
+					'permission_callback' => $auth,
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/push/test',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( __CLASS__, 'push_test' ),
+				'permission_callback' => $auth,
+			)
+		);
 	}
 
 	/**
@@ -326,6 +399,9 @@ class Hibi_Rest {
 				'nonce_url' => esc_url_raw( add_query_arg( 'action', 'hibi_nonce', admin_url( 'admin-ajax.php' ) ) ),
 				'login_url' => esc_url_raw( wp_login_url() ),
 				'home_path' => (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ),
+			),
+			'push'     => array(
+				'public_key' => Hibi_Push::public_key(),
 			),
 		);
 	}
@@ -472,6 +548,71 @@ class Hibi_Rest {
 			return $result;
 		}
 		return self::no_store( rest_ensure_response( array( 'deleted' => true ) ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function get_weather( WP_REST_Request $request ) {
+		$weather = Hibi_Weather::get( $request['lat'], $request['lng'], $request['date'] );
+		if ( is_wp_error( $weather ) ) {
+			return $weather;
+		}
+		return self::no_store( rest_ensure_response( $weather ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function get_places( WP_REST_Request $request ) {
+		$query = (string) $request['q'];
+		// Place names are matched in the result language, so a Japanese query
+		// needs Japanese results whatever the user's locale.
+		$lang   = preg_match( '/[\x{3040}-\x{30FF}\x{4E00}-\x{9FFF}]/u', $query ) ? 'ja' : substr( get_user_locale(), 0, 2 );
+		$places = Hibi_Weather::geocode( $query, $lang );
+		if ( is_wp_error( $places ) ) {
+			return $places;
+		}
+		return self::no_store( rest_ensure_response( $places ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function push_subscribe( WP_REST_Request $request ) {
+		$ready = Hibi_Push::available();
+		if ( true !== $ready ) {
+			return $ready;
+		}
+		$result = Hibi_Push::subscribe( get_current_user_id(), (array) $request->get_json_params() );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		return self::no_store( rest_ensure_response( array( 'subscribed' => true ) ) );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function push_unsubscribe( WP_REST_Request $request ) {
+		$params = (array) $request->get_json_params();
+		Hibi_Push::unsubscribe( get_current_user_id(), isset( $params['endpoint'] ) ? (string) $params['endpoint'] : '' );
+		return self::no_store( rest_ensure_response( array( 'subscribed' => false ) ) );
+	}
+
+	/**
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function push_test() {
+		$result = Hibi_Push::send( get_current_user_id(), __( 'Hibi', 'hibi-journal' ), __( 'Notifications are working.', 'hibi-journal' ) );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		return self::no_store( rest_ensure_response( $result ) );
 	}
 
 	public static function get_settings() {

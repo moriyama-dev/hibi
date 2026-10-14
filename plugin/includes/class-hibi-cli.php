@@ -96,6 +96,25 @@ class Hibi_CLI {
 	}
 
 	/**
+	 * Sends today's reminder to everyone whose reminder time has passed and
+	 * who has not written yet. Run it from the server's cron every five
+	 * minutes; the README shows the crontab line.
+	 *
+	 * @subcommand send-reminders
+	 */
+	public function send_reminders() {
+		$results = Hibi_Push::send_due_reminders();
+		foreach ( $results as $user_id => $result ) {
+			if ( is_wp_error( $result ) ) {
+				WP_CLI::warning( sprintf( 'User %d: %s', $user_id, $result->get_error_message() ) );
+				continue;
+			}
+			WP_CLI::log( sprintf( 'User %d: sent %d, failed %d, removed %d.', $user_id, $result['sent'], $result['failed'], $result['removed'] ) );
+		}
+		WP_CLI::success( sprintf( '%d reminder(s) due.', count( $results ) ) );
+	}
+
+	/**
 	 * Removes the seed user and all of its entries.
 	 */
 	private function clean() {

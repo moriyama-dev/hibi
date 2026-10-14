@@ -26,6 +26,10 @@ add_action( 'after_switch_theme', 'hibi_theme_flush_rewrites' );
 add_action( 'switch_theme', 'flush_rewrite_rules' );
 add_action( 'wp_enqueue_scripts', 'hibi_theme_assets', 20 );
 add_action( 'template_redirect', 'hibi_theme_not_found_status' );
+add_action( 'parse_request', 'hibi_theme_serve_app_files', 0 );
+add_action( 'init', 'hibi_theme_maybe_flush_rewrites', 20 );
+add_action( 'wp_head', 'hibi_theme_head_tags', 2 );
+add_action( 'send_headers', 'hibi_theme_shell_header' );
 
 function hibi_theme_setup() {
 	load_theme_textdomain( 'hibi', HIBI_THEME_DIR . '/languages' );
@@ -36,6 +40,8 @@ function hibi_theme_setup() {
 }
 
 function hibi_theme_rewrites() {
+	add_rewrite_rule( '^hibi-sw\\.js$', 'index.php?hibi_asset=sw', 'top' );
+	add_rewrite_rule( '^manifest\\.webmanifest$', 'index.php?hibi_asset=manifest', 'top' );
 	add_rewrite_rule( '^d/(\d{4}-\d{2}-\d{2})/?$', 'index.php?hibi_view=day&hibi_date=$matches[1]', 'top' );
 	add_rewrite_rule( '^(' . implode( '|', array_map( 'preg_quote', HIBI_THEME_VIEWS ) ) . ')/?$', 'index.php?hibi_view=$matches[1]', 'top' );
 }
@@ -47,12 +53,23 @@ function hibi_theme_rewrites() {
 function hibi_theme_query_vars( $vars ) {
 	$vars[] = 'hibi_view';
 	$vars[] = 'hibi_date';
+	$vars[] = 'hibi_asset';
 	return $vars;
 }
 
 function hibi_theme_flush_rewrites() {
 	hibi_theme_rewrites();
 	flush_rewrite_rules();
+}
+
+/**
+ * Rewrite rules change with the theme version; flush once after an update.
+ */
+function hibi_theme_maybe_flush_rewrites() {
+	if ( get_option( 'hibi_theme_rewrite_version' ) !== HIBI_THEME_VERSION . '-2' ) {
+		flush_rewrite_rules( false );
+		update_option( 'hibi_theme_rewrite_version', HIBI_THEME_VERSION . '-2', false );
+	}
 }
 
 /**
@@ -136,4 +153,140 @@ function hibi_theme_print_bootstrap() {
 		'<script type="application/json" id="hibi-bootstrap">%s</script>' . "\n",
 		wp_json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON with HTML-significant characters hex-escaped.
 	);
+}
+
+/**
+ * Marks the shell so the service worker caches only real app pages, never
+ * a login form or an error page.
+ */
+function hibi_theme_shell_header() {
+	if ( is_user_logged_in() && ! is_admin() && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		header( 'X-Hibi-Shell: 1' );
+	}
+}
+
+/**
+ * Home path, e.g. "/" or "/journal/".
+ *
+ * @return string
+ */
+function hibi_theme_home_path() {
+	return trailingslashit( (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ) );
+}
+
+/**
+ * Paths the service worker stores on install.
+ *
+ * @return string[]
+ */
+function hibi_theme_precache() {
+	$base  = (string) wp_parse_url( HIBI_THEME_URL, PHP_URL_PATH );
+	$paths = array();
+	$path  = HIBI_THEME_DIR . '/assets/dist/manifest.json';
+	$data  = is_readable( $path ) ? json_decode( (string) file_get_contents( $path ), true ) : array(); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
+	foreach ( (array) $data as $chunk ) {
+		if ( ! empty( $chunk['file'] ) ) {
+			$paths[] = $base . '/assets/dist/' . $chunk['file'];
+		}
+	}
+	foreach ( array( 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon-32.png' ) as $icon ) {
+		$paths[] = $base . '/assets/icons/' . $icon;
+	}
+	return array_values( array_unique( $paths ) );
+}
+
+/**
+ * Serves /hibi-sw.js and /manifest.webmanifest. Runs before the access
+ * gate redirects logged-out visitors: neither file holds journal data, and
+ * the browser must be able to update the service worker at any time.
+ *
+ * @param WP $wp Request.
+ */
+function hibi_theme_serve_app_files( $wp ) {
+	$asset = isset( $wp->query_vars['hibi_asset'] ) ? $wp->query_vars['hibi_asset'] : '';
+	if ( 'sw' === $asset ) {
+		hibi_theme_send_service_worker();
+	}
+	if ( 'manifest' === $asset ) {
+		hibi_theme_send_manifest();
+	}
+}
+
+function hibi_theme_send_service_worker() {
+	$source   = HIBI_THEME_DIR . '/assets/sw.js';
+	$precache = hibi_theme_precache();
+	$version  = substr( md5( HIBI_THEME_VERSION . implode( ',', $precache ) . filemtime( $source ) ), 0, 12 );
+	$config   = array(
+		'version'  => $version,
+		'home'     => hibi_theme_home_path(),
+		'precache' => $precache,
+		'icon'     => (string) wp_parse_url( HIBI_THEME_URL, PHP_URL_PATH ) . '/assets/icons/icon-192.png',
+	);
+
+	status_header( 200 );
+	header( 'Content-Type: application/javascript; charset=utf-8' );
+	header( 'Service-Worker-Allowed: ' . hibi_theme_home_path() );
+	header( 'Cache-Control: no-cache' );
+	header( 'X-Content-Type-Options: nosniff' );
+	echo 'self.HIBI_SW = ' . wp_json_encode( $config, JSON_UNESCAPED_SLASHES ) . ";\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON in a JavaScript file.
+	readfile( $source ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Static script shipped with the theme.
+	exit;
+}
+
+function hibi_theme_send_manifest() {
+	$icons    = HIBI_THEME_URL . '/assets/icons/';
+	$manifest = array(
+		'name'             => 'Hibi',
+		'short_name'       => 'Hibi',
+		'description'      => __( 'A private daily journal.', 'hibi' ),
+		'lang'             => get_bloginfo( 'language' ),
+		'id'               => hibi_theme_home_path(),
+		'start_url'        => hibi_theme_home_path(),
+		'scope'            => hibi_theme_home_path(),
+		'display'          => 'standalone',
+		'background_color' => '#f7f6f3',
+		'theme_color'      => '#f7f6f3',
+		'icons'            => array(
+			array(
+				'src'     => $icons . 'icon-192.png',
+				'sizes'   => '192x192',
+				'type'    => 'image/png',
+				'purpose' => 'any',
+			),
+			array(
+				'src'     => $icons . 'icon-512.png',
+				'sizes'   => '512x512',
+				'type'    => 'image/png',
+				'purpose' => 'any',
+			),
+			array(
+				'src'     => $icons . 'icon-maskable-512.png',
+				'sizes'   => '512x512',
+				'type'    => 'image/png',
+				'purpose' => 'maskable',
+			),
+		),
+	);
+
+	status_header( 200 );
+	header( 'Content-Type: application/manifest+json; charset=utf-8' );
+	header( 'Cache-Control: no-cache' );
+	echo wp_json_encode( $manifest, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON document.
+	exit;
+}
+
+/**
+ * Manifest, icons and colours for installing the app.
+ */
+function hibi_theme_head_tags() {
+	$icons = HIBI_THEME_URL . '/assets/icons/';
+	printf( '<link rel="manifest" href="%s" crossorigin="use-credentials">' . "\n", esc_url( home_url( '/manifest.webmanifest' ) ) );
+	printf( '<link rel="icon" href="%s" sizes="32x32">' . "\n", esc_url( $icons . 'favicon-32.png' ) );
+	printf( '<link rel="apple-touch-icon" href="%s">' . "\n", esc_url( $icons . 'apple-touch-icon.png' ) );
+	echo '<meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">' . "\n";
+	echo '<meta name="theme-color" content="#15171b" media="(prefers-color-scheme: dark)">' . "\n";
+	echo '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n";
+	echo '<meta name="mobile-web-app-capable" content="yes">' . "\n";
+	echo '<meta name="apple-mobile-web-app-title" content="Hibi">' . "\n";
+	echo '<meta name="apple-mobile-web-app-status-bar-style" content="default">' . "\n";
 }

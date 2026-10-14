@@ -143,3 +143,33 @@ First load: JS 19.7 KB + CSS 3.4 KB gzip.
 
 - PHPUnit: 67 tests pass (photos: GPS removed, orientation applied, capture time kept, size caps, owner-only delete, entry deletion; queries; search terms, highlighting, kana, voiced kana, LIKE wildcards, paging; per-author isolation).
 - Playwright: 30 of 30 pass on desktop and mobile. New: reading view and escaping, calendar, timeline filter, search with Ctrl/Cmd+K, on this day, photo upload (GPS gone, 401 logged out, 403 for the file URL, delete), tags.
+
+## Phase 4 — App install, offline and reminders (2026-10-14)
+
+### Done
+
+- Manifest at `/manifest.webmanifest` (linked with `crossorigin="use-credentials"`) and service worker at `/hibi-sw.js` with `Service-Worker-Allowed: /`. Both are answered in `parse_request`, before the access gate, because neither contains journal data and the browser must be able to update the worker while logged out.
+- Icons (192, 512, maskable 512, Apple touch 180, favicon) drawn from shapes by `bin/make-icons.php`.
+- Service worker: app screens network-first with a 4 s timeout, falling back to the last shell (only pages marked `X-Hibi-Shell: 1` are stored, never a login form); built assets and icons cache-first, precached per build; API GETs network-first with a 300-entry cache; photo thumbnails cache-first, 300 entries. The worker fetches the shell itself on activation, because the page that installed it never passed through it.
+- Unsent edits are written to IndexedDB (`hibi-<user id>`) on every change, before any request. Drafts of the open day are sent by its editor; others are sent in the background on start-up, on `online` and when the app becomes visible. A notice lists days still waiting or in conflict.
+- A 409 whose server copy already matches the unsent fields is treated as saved (a save sent while the page was closing can reach the server after the page is gone).
+- The "leave this page?" prompt was removed: with drafts on the device it only got in the way.
+- Offline, a day that was never loaded can still be written ("write anyway"); the conflict banner handles any clash later.
+- Web Push: VAPID keys created on activation (`hibi_vapid_keys`, not autoloaded); `minishlink/web-push` 9 bundled in `plugin/vendor`. Subscriptions in user meta (up to 10 devices, HTTPS endpoints only). Reminders: once a day, after the reminder time, only if the day is still empty; a reminder time before the day start hour belongs to the evening before. `wp hibi send-reminders` for the server cron, and a five-minute WP-Cron event as a backup, with a lock so both cannot send twice. Endpoints that answer 404/410 are removed.
+- Weather from Open-Meteo through the server (`GET weather`), cached for an hour; dates older than 90 days use the archive API. Place chosen in the settings by name search (`GET places`, Open-Meteo geocoding; Japanese queries are searched in Japanese) or the current position. Today's weather is added once, after the editor is ready.
+- Settings screen (first part): reminder on/off, time, test notification, iPhone note; weather on/off and place; day start hour.
+
+### VM setup
+
+- Takumi PWA deactivated while Hibi is developed (settings kept).
+- `crontab` for yoshi: `*/5 * * * * /usr/local/bin/wp --path=/var/www/html hibi send-reminders --quiet >> ~/logs/hibi-reminders.log 2>&1`. First run at 18:25 without errors.
+
+### Tests
+
+- PHPUnit: 77 tests pass. New: VAPID keys, subscription validation, encrypted delivery to a local stand-in push service (aes128gcm, VAPID header, removal on 410), reminder timing (before/after the time, once a day, not when written, after-midnight times), cron schedule, weather (mocked HTTP, cache, archive URL, failure), weather place validation.
+- Playwright: 40 of 40 pass on desktop and mobile with full Chromium and `--unsafely-treat-insecure-origin-as-secure` (the VM serves plain http). New: manifest and service worker scope, writing offline and reloading offline, background sending of another day, offline conflict, weather place.
+- "Leaving the page saves immediately" failed once in about fifty runs: the keepalive save did not reach the server within 5 s. The text was not lost (the draft is sent on the next visit), and the test now checks that guarantee.
+
+### Not verified
+
+- Real push delivery to a phone, and the service worker on a phone: both need HTTPS, which the VM does not have.

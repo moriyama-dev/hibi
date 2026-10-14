@@ -3,8 +3,10 @@ import { api } from '../api';
 import { dayLabel, shiftDate, timeStamp, yearLabel } from '../date';
 import { beforeNavigate, dayHref, navigate } from '../router';
 import { EntrySaver } from '../saver';
-import { boot, entryCache, stats, today } from '../store';
-import type { Entry, Mood, Photo } from '../types';
+import { drafts, type Draft } from '../drafts';
+import { boot, entryCache, settings, stats, today } from '../store';
+import { openDates, refreshDraftState } from '../sync';
+import type { Entry, Mood, Photo, Weather } from '../types';
 import { ConflictBanner } from './ConflictBanner';
 import { OnThisDayCard } from './OnThisDay';
 import { PhotoButton, PhotoStrip } from './Photos';
@@ -28,40 +30,56 @@ interface Props {
 }
 
 export function DayView( { date, isToday }: Props ) {
-	const [ entry, setEntry ] = useState<Entry | null>( () => entryCache.get( date ) ?? null );
+	const [ entry, setEntry ] = useState<Entry | null>( null );
+	const [ draft, setDraft ] = useState<Draft | undefined>( undefined );
 	const [ loadError, setLoadError ] = useState( false );
 	// Past days open for reading, so leafing through cannot change them by accident.
 	const [ editing, setEditing ] = useState( isToday );
 
-	useEffect( () => setEditing( isToday ), [ date, isToday ] );
-
 	useEffect( () => {
-		const cached = entryCache.get( date );
-		setEntry( cached ?? null );
-		setLoadError( false );
-		if ( cached ) {
-			return;
-		}
 		let alive = true;
-		api.getEntry( date )
-			.then( ( e ) => {
-				entryCache.set( date, e );
-				if ( alive ) {
-					setEntry( e );
-				}
-			} )
-			.catch( () => alive && setLoadError( true ) );
+		setEntry( null );
+		setLoadError( false );
+		setEditing( isToday );
+
+		// The draft lookup takes a few milliseconds; waiting for it means the
+		// editor never shows older text and then swaps it out.
+		const cached = entryCache.get( date );
+		const remote = cached ? Promise.resolve( cached ) : api.getEntry( date ).then( ( e ) => ( entryCache.set( date, e ), e ) );
+		Promise.all( [ drafts.get( date ), remote.catch( () => null ) ] ).then( ( [ d, e ] ) => {
+			if ( ! alive ) {
+				return;
+			}
+			setDraft( d );
+			if ( d ) {
+				setEditing( true );
+			}
+			if ( e ) {
+				setEntry( e );
+			} else if ( d ) {
+				setEntry( blankEntry( date, d.base_version ) );
+			} else {
+				setLoadError( true );
+			}
+		} );
 		return () => {
 			alive = false;
 		};
 	}, [ date ] );
 
+	const writeOffline = () => {
+		setLoadError( false );
+		setEditing( true );
+		setEntry( blankEntry( date, 0 ) );
+	};
+
 	return (
 		<div class="day">
 			<DayHeader date={ date } isToday={ isToday } />
-			{ entry && editing && <Editor key={ date } entry={ entry } isToday={ isToday } /> }
+			{ entry && editing && <Editor key={ date } entry={ entry } draft={ draft } isToday={ isToday } /> }
 			{ entry && ! editing && (
 				<div class="reading">
+					{ entry.weather && <WeatherChip weather={ entry.weather } /> }
 					{ entry.mood && <p class="read-mood">気分：{ MOODS[ entry.mood - 1 ].label }</p> }
 					<ReadView entry={ entry } />
 					<PhotoStrip date={ date } photos={ entry.photos } editable={ false } onChange={ () => undefined } />
@@ -71,12 +89,46 @@ export function DayView( { date, isToday }: Props ) {
 					</button>
 				</div>
 			) }
-			{ ! entry && (
+			{ ! entry && ! loadError && (
 				<p class="day-loading" role="status">
-					{ loadError ? '読み込めませんでした。通信状態を確認してください。' : '読み込み中…' }
+					読み込み中…
 				</p>
 			) }
+			{ loadError && (
+				<div class="day-loading" role="status">
+					<p>この日の日記を読み込めませんでした。オフラインかもしれません。</p>
+					<button type="button" class="edit-button" onClick={ writeOffline }>
+						このまま書く（接続が戻ったら送ります）
+					</button>
+				</div>
+			) }
 		</div>
+	);
+}
+
+function blankEntry( date: string, version: number ): Entry {
+	return {
+		date,
+		exists: false,
+		content: '',
+		mood: null,
+		tags: [],
+		weather: null,
+		location: null,
+		char_count: 0,
+		photos: [],
+		version,
+		updated_at: null,
+	};
+}
+
+export function WeatherChip( { weather }: { weather: Weather } ) {
+	const temps = weather.temp_max !== null && weather.temp_min !== null ? ` ${ Math.round( weather.temp_max ) }°/${ Math.round( weather.temp_min ) }°` : '';
+	return (
+		<span class="chip weather">
+			{ weather.label }
+			{ temps }
+		</span>
 	);
 }
 
@@ -118,28 +170,70 @@ function DayHeader( { date, isToday }: Props ) {
 
 interface EditorProps {
 	entry: Entry;
+	draft?: Draft;
 	isToday: boolean;
 }
 
-function Editor( { entry, isToday }: EditorProps ) {
+function Editor( { entry, draft, isToday }: EditorProps ) {
 	const textarea = useRef<HTMLTextAreaElement>( null );
-	const [ mood, setMood ] = useState<Mood | null>( entry.mood );
-	const [ chars, setChars ] = useState( entry.char_count );
-	const [ tags, setTags ] = useState<string[]>( entry.tags );
-	const [ showTags, setShowTags ] = useState( entry.tags.length > 0 );
+	const initial = {
+		content: draft?.fields.content ?? entry.content,
+		mood: draft && 'mood' in draft.fields ? draft.fields.mood ?? null : entry.mood,
+		tags: draft?.fields.tags ?? entry.tags,
+		weather: draft?.fields.weather ?? entry.weather,
+	};
+	const [ mood, setMood ] = useState<Mood | null>( initial.mood );
+	const [ chars, setChars ] = useState( countChars( initial.content ) );
+	const [ tags, setTags ] = useState<string[]>( initial.tags );
+	const [ weather, setWeather ] = useState<Weather | null>( initial.weather );
+	const [ showTags, setShowTags ] = useState( initial.tags.length > 0 );
 	const [ photos, setPhotos ] = useState<Photo[]>( entry.photos );
 
 	const saver = useMemo(
 		() =>
-			new EntrySaver( entry.date, entry, ( saved ) => {
+			new EntrySaver(
+				entry.date,
+				entry,
+				( saved ) => {
 				// The cache keeps what is on screen, so coming back to this day shows it.
 				entryCache.set( saved.date, { ...saved, content: textarea.current?.value ?? saved.content } );
 				if ( saved.date === today.value && saved.char_count > 0 && ! stats.value.written_today ) {
 					api.getStats().then( ( s ) => ( stats.value = s ) ).catch( () => undefined );
 				}
-			} ),
+				},
+				draft
+			),
 		[ entry.date ]
 	);
+
+	// Keep the background sync away from the day being edited here.
+	useEffect( () => {
+		openDates.add( entry.date );
+		return () => {
+			openDates.delete( entry.date );
+			refreshDraftState();
+		};
+	}, [ entry.date ] );
+
+	// Today's weather is added once, without asking.
+	useEffect( () => {
+		const s = settings.value;
+		if ( ! isToday || weather || ! s.weather_enabled || s.weather_lat === null || s.weather_lng === null || ! navigator.onLine ) {
+			return;
+		}
+		let alive = true;
+		api.weather( s.weather_lat, s.weather_lng, entry.date )
+			.then( ( w ) => {
+				if ( alive ) {
+					setWeather( w );
+					saver.change( { weather: w } );
+				}
+			} )
+			.catch( () => undefined );
+		return () => {
+			alive = false;
+		};
+	}, [ entry.date ] );
 
 	// Set the text once; the textarea is uncontrolled so re-renders never
 	// touch it while an IME composition is open.
@@ -148,7 +242,7 @@ function Editor( { entry, isToday }: EditorProps ) {
 		if ( ! el ) {
 			return;
 		}
-		el.value = entry.content;
+		el.value = initial.content;
 		grow( el );
 		if ( finePointer ) {
 			el.focus( { preventScroll: true } );
@@ -185,22 +279,14 @@ function Editor( { entry, isToday }: EditorProps ) {
 		};
 		const onPageHide = () => saver.flush( true );
 		const onOnline = () => saver.retryNow();
-		const onBeforeUnload = ( event: BeforeUnloadEvent ) => {
-			if ( saver.hasUnsaved ) {
-				saver.flush( true );
-				event.preventDefault();
-			}
-		};
 		document.addEventListener( 'visibilitychange', onHide );
 		window.addEventListener( 'pagehide', onPageHide );
 		window.addEventListener( 'online', onOnline );
-		window.addEventListener( 'beforeunload', onBeforeUnload );
 		const unguard = beforeNavigate( () => saver.flush( true ) );
 		return () => {
 			document.removeEventListener( 'visibilitychange', onHide );
 			window.removeEventListener( 'pagehide', onPageHide );
 			window.removeEventListener( 'online', onOnline );
-			window.removeEventListener( 'beforeunload', onBeforeUnload );
 			unguard();
 			saver.flush( true );
 			saver.dispose();
@@ -302,6 +388,12 @@ function Editor( { entry, isToday }: EditorProps ) {
 	return (
 		<>
 			{ saver.conflict.value && <ConflictBanner onChoose={ onResolve } /> }
+
+			{ weather && (
+				<p class="meta">
+					<WeatherChip weather={ weather } />
+				</p>
+			) }
 
 			<div class="moods" role="group" aria-label="今日の気分">
 				{ MOODS.map( ( m ) => (

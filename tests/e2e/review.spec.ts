@@ -1,12 +1,15 @@
 import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { clearEntries, serverEntry, shift, today, writeOnServer } from './entries';
+import { clearEntries, resetSettings, serverEntry, shift, today, writeOnServer } from './entries';
 import { php } from './wp';
 
 const BASE = process.env.HIBI_BASE_URL ?? 'http://localhost';
 
-test.beforeEach( () => clearEntries() );
+test.beforeEach( () => {
+	clearEntries();
+	resetSettings();
+} );
 
 test( 'a past day opens formatted for reading, with raw HTML shown as text', async ( { page } ) => {
 	const day = shift( today(), -3 );

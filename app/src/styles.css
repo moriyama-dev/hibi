@@ -977,3 +977,129 @@ a.cal-day:hover {
 	background: color-mix(in srgb, var(--warn) 30%, transparent);
 	color: var(--fg);
 }
+
+/* ---------- Phase 4 ---------- */
+
+.meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 4px 0 0;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 1px 10px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: var(--surface);
+	font-size: 12px;
+	color: var(--muted);
+}
+
+.reading .chip {
+	margin-bottom: 4px;
+}
+
+.sync-notice {
+	margin: 8px 0;
+	padding: 10px 14px;
+	border: 1px solid color-mix(in srgb, var(--warn) 50%, var(--line));
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--warn) 8%, var(--surface));
+	font-size: 13px;
+}
+
+.sync-notice p {
+	margin: 0;
+}
+
+.sync-notice a {
+	margin-left: 8px;
+}
+
+.settings .setting {
+	padding: 16px 0;
+	border-bottom: 1px solid var(--line);
+}
+
+.settings h2 {
+	margin: 0 0 4px;
+	font-size: 16px;
+}
+
+.hint {
+	margin: 4px 0;
+	font-size: 13px;
+	color: var(--muted);
+}
+
+.field {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	font-size: 14px;
+}
+
+.field input,
+.settings select,
+.place-search input {
+	min-height: 40px;
+	padding: 0 10px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	background: var(--surface);
+	color: var(--fg);
+	font: inherit;
+}
+
+.place-search {
+	display: flex;
+	gap: 8px;
+	margin: 8px 0;
+}
+
+.place-search input {
+	flex: 1;
+	min-width: 0;
+}
+
+.places {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 0;
+	list-style: none;
+}
+
+.places button {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+	min-height: 44px;
+	padding: 6px 12px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	background: var(--surface);
+	text-align: left;
+	cursor: pointer;
+}
+
+.places small {
+	color: var(--muted);
+}
+
+.link-button {
+	display: block;
+	margin-top: 8px;
+	padding: 8px 0;
+	border: 0;
+	background: none;
+	color: var(--accent);
+	font-size: 14px;
+	text-decoration: underline;
+	cursor: pointer;
+}

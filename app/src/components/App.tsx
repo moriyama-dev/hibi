@@ -7,6 +7,8 @@ import { Nav } from './Nav';
 import { OnThisDayView } from './OnThisDay';
 import { Pending } from './Pending';
 import { SearchView } from './SearchView';
+import { SettingsView } from './SettingsView';
+import { SyncNotice } from './SyncNotice';
 import { TimelineView } from './TimelineView';
 
 export function App() {
@@ -54,12 +56,13 @@ export function App() {
 		<div class="shell">
 			<Nav />
 			<main class="main" id="main">
+				<SyncNotice />
 				{ r.name === 'day' && <DayView key={ r.date } date={ r.date } isToday={ r.isToday } /> }
 				{ r.name === 'calendar' && <CalendarView /> }
 				{ r.name === 'timeline' && <TimelineView /> }
 				{ r.name === 'on-this-day' && <OnThisDayView /> }
 				{ r.name === 'search' && <SearchView /> }
-				{ r.name === 'settings' && <Pending title="設定" /> }
+				{ r.name === 'settings' && <SettingsView /> }
 				{ r.name === 'not-found' && <Pending title="ページが見つかりません" /> }
 			</main>
 		</div>

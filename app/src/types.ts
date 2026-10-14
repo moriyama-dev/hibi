@@ -64,6 +64,9 @@ export interface Settings {
 	reminder_enabled: boolean;
 	reminder_time: string;
 	weather_enabled: boolean;
+	weather_lat: number | null;
+	weather_lng: number | null;
+	weather_place: string;
 	location_enabled: boolean;
 	prompts_enabled: boolean;
 	font_size: 'S' | 'M' | 'L';
@@ -94,10 +97,20 @@ export interface Bootstrap {
 		login_url: string;
 		home_path: string;
 	};
+	push: { public_key: string };
 }
 
 export interface EntryFields {
 	content?: string;
 	mood?: Mood | null;
 	tags?: string[];
+	weather?: Weather | null;
+}
+
+export interface Place {
+	name: string;
+	admin: string;
+	country: string;
+	lat: number;
+	lng: number;
 }

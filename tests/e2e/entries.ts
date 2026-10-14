@@ -36,3 +36,8 @@ export function clearEntries(): void {
 		`foreach ( get_posts( array( 'post_type' => 'hibi_entry', 'post_status' => 'any', 'author' => ${ userId() }, 'posts_per_page' => -1, 'fields' => 'ids' ) ) as $id ) { wp_delete_post( $id, true ); } echo '1';`
 	);
 }
+
+/** Back to default settings, so one test's choices never leak into the next. */
+export function resetSettings(): void {
+	php( `delete_user_meta( ${ userId() }, 'hibi_settings' ); echo '1';` );
+}
