@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Node
+node_modules/
+
+# Build artifacts
+*.zip
+dist-zip/
+
+# Test output
+test-results/
+playwright-report/
+coverage/
+.phpunit.result.cache
+
+# Translations: ship languages/*.pot only.
+# translate.wordpress.org handles .po/.mo.
+*.po
+*.mo
