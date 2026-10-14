@@ -88,6 +88,7 @@ class Hibi_Settings {
 			$out[ $key ] = in_array( $value, $allowed, true ) ? $value : $defaults[ $key ];
 		}
 
-		return $out;
+		// Same key order as the defaults.
+		return array_replace( $defaults, $out );
 	}
 }
