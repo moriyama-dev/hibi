@@ -22,3 +22,28 @@ define( 'HIBI_VERSION', '0.1.0' );
 define( 'HIBI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'HIBI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'HIBI_PLUGIN_FILE', __FILE__ );
+
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-settings.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-day.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-entry-type.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-entries.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-stats.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-rest.php';
+
+Hibi_Entry_Type::init();
+Hibi_Entries::init();
+Hibi_Rest::init();
+
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-cli.php';
+	WP_CLI::add_command( 'hibi', 'Hibi_CLI' );
+}
+
+/**
+ * Whether the Hibi Journal plugin is loaded. The Hibi theme checks this.
+ *
+ * @return bool
+ */
+function hibi_is_active() {
+	return true;
+}

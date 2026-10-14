@@ -34,3 +34,44 @@ All times are America/Toronto.
 
 - Install composer and the PHP extensions gmp (or bcmath) and imagick. These need root.
 - Takumi PWA (separate project) also registers a service worker. Both must not be active on the same site.
+
+## Phase 1 — Plugin foundation (2026-10-14, in progress)
+
+### Done
+
+- Post type `hibi_entry` (always private, one per author per day, dated local noon) and taxonomy `hibi_tag`.
+- Day rules: the journal day starts at the user's `day_start_hour` (default 4:00), evaluated on the wall clock in the site timezone, so DST transition days keep the same boundary.
+- Saving runs under a MySQL named lock per author and date. Six simultaneous first saves produced one entry (one 200, five 409).
+- Optimistic locking with `_hibi_version`; a stale `base_version` returns 409 with the server copy.
+- Markdown is stored verbatim (kses is bypassed for this post type only and restored afterwards; the reader escapes before rendering).
+- Revisions: at most one per 10 minutes, plus one when the page is left; 50 kept.
+- REST `hibi/v1`: `bootstrap`, `entries/{date}` (GET, PUT), `settings` (GET, PUT), `stats`. Responses are `Cache-Control: private, no-store`.
+- Nonce refresh lives at `admin-ajax.php?action=hibi_nonce` instead of `GET /nonce`: once the REST nonce has expired, WordPress treats REST requests as logged out, so a REST route could not hand out the replacement.
+- `wp hibi seed --days=<n>` writes into a dedicated user `hibi-seed`; `wp hibi seed --clean` removes the user and every entry.
+- PHPUnit suite (`tests/php`) and `bin/install-wp-tests.sh`, which installs a separate WordPress core and the test library under `~/.cache/hibi-wp-tests/` and refuses to use the site database.
+
+### Measurements (2,552 entries over 3,000 days, HTTP on the VM)
+
+| Request | Time |
+|---|---|
+| `GET bootstrap` | 37 ms |
+| `GET stats` | 35 ms |
+| `GET entries/{date}` | 12 ms |
+| `wp hibi seed --days=3000` | 259 s |
+| `wp hibi seed --clean` | 207 s |
+
+### Checked over HTTP
+
+- Logged out: 401 (from the access gate). Invalid nonce: 403 `rest_cookie_invalid_nonce`.
+- Another user's date returns `exists: false`; writing it creates that user's own entry and leaves the owner's untouched.
+- Future date: 400. Invalid date or mood: 400.
+
+### Packages installed
+
+- composer 2.7.1, php8.3-gmp, php8.3-bcmath, php8.3-imagick (HEIC supported), php8.3-intl.
+- Dev: phpunit/phpunit 9.6, yoast/phpunit-polyfills 2.
+
+### Open items
+
+- The PHPUnit run needs a separate test database (`wp_hibi_test`).
+- The site uses plain permalinks and Apache has `AllowOverride None`, so `/wp-json/` and `.htaccess` files do not work on the VM. This affects the app URLs (`/d/YYYY-MM-DD`) and the photo folder protection.
