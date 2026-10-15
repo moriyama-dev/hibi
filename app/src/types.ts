@@ -98,6 +98,10 @@ export interface Bootstrap {
 		home_path: string;
 	};
 	push: { public_key: string };
+	locale: string;
+	i18n: Record<string, string>;
+	prompts: string[];
+	logout_url: string;
 }
 
 export interface EntryFields {

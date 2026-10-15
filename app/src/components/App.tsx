@@ -10,6 +10,7 @@ import { SearchView } from './SearchView';
 import { SettingsView } from './SettingsView';
 import { SyncNotice } from './SyncNotice';
 import { TimelineView } from './TimelineView';
+import { t } from '../i18n';
 
 export function App() {
 	const r = route.value;
@@ -63,7 +64,7 @@ export function App() {
 				{ r.name === 'on-this-day' && <OnThisDayView /> }
 				{ r.name === 'search' && <SearchView /> }
 				{ r.name === 'settings' && <SettingsView /> }
-				{ r.name === 'not-found' && <Pending title="ページが見つかりません" /> }
+				{ r.name === 'not-found' && <Pending title={ t( 'not_found' ) } /> }
 			</main>
 		</div>
 	);

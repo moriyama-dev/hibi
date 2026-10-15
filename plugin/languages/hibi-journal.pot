@@ -1,0 +1,247 @@
+# Copyright (C) 2026 Yoshiro Moriyama (Takumi Web Services)
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Hibi Journal 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/plugin\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-15T02:00:37+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: hibi-journal\n"
+
+#. Plugin Name of the plugin
+#: hibi-journal.php
+#: includes/class-hibi-entry-type.php:34
+msgid "Hibi Journal"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: hibi-journal.php
+msgid "https://github.com/moriyama-dev/hibi"
+msgstr ""
+
+#. Description of the plugin
+#: hibi-journal.php
+msgid "Turns WordPress into a private, distraction-free daily journal."
+msgstr ""
+
+#. Author of the plugin
+#: hibi-journal.php
+msgid "Yoshiro Moriyama (Takumi Web Services)"
+msgstr ""
+
+#. Author URI of the plugin
+#: hibi-journal.php
+msgid "https://takumi.ca"
+msgstr ""
+
+#: includes/class-hibi-entries.php:100
+#: includes/class-hibi-entries.php:126
+msgid "The entry is being saved from another request. Please try again."
+msgstr ""
+
+#: includes/class-hibi-entries.php:172
+msgid "This entry was updated on another device."
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:32
+msgid "Journal Entries"
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:33
+msgid "Journal Entry"
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:35
+msgid "All Entries"
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:36
+msgid "Edit Entry"
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:37
+msgid "Search Entries"
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:38
+msgid "No entries found."
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:64
+msgid "Journal Tags"
+msgstr ""
+
+#: includes/class-hibi-entry-type.php:65
+msgid "Journal Tag"
+msgstr ""
+
+#: includes/class-hibi-export.php:57
+msgid "Exporting needs the PHP Zip extension."
+msgstr ""
+
+#: includes/class-hibi-export.php:62
+msgid "The export file could not be created."
+msgstr ""
+
+#: includes/class-hibi-export.php:173
+msgid "The import file is missing or too large."
+msgstr ""
+
+#: includes/class-hibi-export.php:180
+msgid "Importing a ZIP needs the PHP Zip extension."
+msgstr ""
+
+#: includes/class-hibi-export.php:184
+msgid "The ZIP file could not be opened."
+msgstr ""
+
+#: includes/class-hibi-export.php:196
+msgid "This is not a Hibi export file."
+msgstr ""
+
+#: includes/class-hibi-export.php:202
+msgid "This file comes from a newer version of Hibi Journal. Please update the plugin first."
+msgstr ""
+
+#: includes/class-hibi-photos.php:59
+#: includes/class-hibi-photos.php:121
+msgid "The photo folder could not be created."
+msgstr ""
+
+#: includes/class-hibi-photos.php:73
+msgid "The photo folder could not be protected."
+msgstr ""
+
+#: includes/class-hibi-photos.php:89
+msgid "The photo could not be uploaded."
+msgstr ""
+
+#: includes/class-hibi-photos.php:105
+msgid "The photo is too large."
+msgstr ""
+
+#: includes/class-hibi-photos.php:110
+msgid "This file type is not supported. Please choose a JPEG, PNG, WebP or HEIC photo."
+msgstr ""
+
+#: includes/class-hibi-photos.php:181
+msgid "HEIC photos need the Imagick PHP extension on the server. Please share the photo as JPEG instead."
+msgstr ""
+
+#: includes/class-hibi-photos.php:228
+#: includes/class-hibi-photos.php:258
+msgid "The photo could not be read."
+msgstr ""
+
+#: includes/class-hibi-photos.php:478
+msgid "Photo not found."
+msgstr ""
+
+#: includes/class-hibi-push.php:53
+msgid "Every five minutes (Hibi Journal)"
+msgstr ""
+
+#: includes/class-hibi-push.php:83
+msgid "Notifications need the OpenSSL PHP extension."
+msgstr ""
+
+#: includes/class-hibi-push.php:86
+msgid "Notifications need the GMP or BCMath PHP extension."
+msgstr ""
+
+#: includes/class-hibi-push.php:89
+msgid "The notification library is missing."
+msgstr ""
+
+#: includes/class-hibi-push.php:148
+msgid "The notification subscription is invalid."
+msgstr ""
+
+#: includes/class-hibi-push.php:329
+#: includes/class-hibi-rest.php:669
+msgid "Hibi"
+msgstr ""
+
+#: includes/class-hibi-push.php:329
+msgid "Would you like to write a little about today?"
+msgstr ""
+
+#: includes/class-hibi-rest.php:366
+msgid "Please log in."
+msgstr ""
+
+#: includes/class-hibi-rest.php:369
+msgid "You cannot use the journal."
+msgstr ""
+
+#: includes/class-hibi-rest.php:450
+#: includes/class-hibi-rest.php:550
+msgid "You cannot write an entry for a future date."
+msgstr ""
+
+#: includes/class-hibi-rest.php:546
+msgid "No photo was sent."
+msgstr ""
+
+#: includes/class-hibi-rest.php:656
+msgid "No file was sent."
+msgstr ""
+
+#: includes/class-hibi-rest.php:669
+msgid "Notifications are working."
+msgstr ""
+
+#: includes/class-hibi-weather.php:33
+msgid "The location is invalid."
+msgstr ""
+
+#: includes/class-hibi-weather.php:64
+msgid "The weather service could not be reached."
+msgstr ""
+
+#: includes/class-hibi-weather.php:70
+msgid "No weather is available for this day."
+msgstr ""
+
+#: includes/class-hibi-weather.php:119
+msgid "The place search could not be reached."
+msgstr ""
+
+#: includes/class-hibi-weather.php:144
+msgid "Clear"
+msgstr ""
+
+#: includes/class-hibi-weather.php:147
+msgid "Partly cloudy"
+msgstr ""
+
+#: includes/class-hibi-weather.php:150
+#: includes/class-hibi-weather.php:167
+msgid "Cloudy"
+msgstr ""
+
+#: includes/class-hibi-weather.php:153
+msgid "Fog"
+msgstr ""
+
+#: includes/class-hibi-weather.php:156
+msgid "Drizzle"
+msgstr ""
+
+#: includes/class-hibi-weather.php:159
+msgid "Rain"
+msgstr ""
+
+#: includes/class-hibi-weather.php:162
+msgid "Snow"
+msgstr ""
+
+#: includes/class-hibi-weather.php:165
+msgid "Thunderstorm"
+msgstr ""

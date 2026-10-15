@@ -3,6 +3,7 @@ import { api } from '../api';
 import type { Card } from '../types';
 import { EntryCard } from './EntryCard';
 import { ReviewTabs } from './ReviewTabs';
+import { t } from '../i18n';
 
 interface Filters {
 	tag: string;
@@ -72,27 +73,27 @@ export function TimelineView() {
 	return (
 		<div class="review">
 			<ReviewTabs />
-			<h1 class="visually-hidden">タイムライン</h1>
+			<h1 class="visually-hidden">{ t( 'timeline.title' ) }</h1>
 			<div class="filters">
-				<select aria-label="タグで絞り込む" value={ filters.tag } onChange={ ( e ) => setFilters( { ...filters, tag: ( e.currentTarget as HTMLSelectElement ).value } ) }>
-					<option value="">すべてのタグ</option>
+				<select aria-label={ t( 'timeline.by_tag' ) } value={ filters.tag } onChange={ ( e ) => setFilters( { ...filters, tag: ( e.currentTarget as HTMLSelectElement ).value } ) }>
+					<option value="">{ t( 'timeline.all_tags' ) }</option>
 					{ tags.map( ( t ) => (
 						<option key={ t } value={ t }>
 							#{ t }
 						</option>
 					) ) }
 				</select>
-				<select aria-label="気分で絞り込む" value={ filters.mood } onChange={ ( e ) => setFilters( { ...filters, mood: +( e.currentTarget as HTMLSelectElement ).value } ) }>
-					<option value={ 0 }>すべての気分</option>
-					<option value={ 5 }>最高</option>
-					<option value={ 4 }>良い</option>
-					<option value={ 3 }>ふつう</option>
-					<option value={ 2 }>悪い</option>
-					<option value={ 1 }>とても悪い</option>
+				<select aria-label={ t( 'timeline.by_mood' ) } value={ filters.mood } onChange={ ( e ) => setFilters( { ...filters, mood: +( e.currentTarget as HTMLSelectElement ).value } ) }>
+					<option value={ 0 }>{ t( 'timeline.all_moods' ) }</option>
+					{ [ 5, 4, 3, 2, 1 ].map( ( m ) => (
+						<option key={ m } value={ m }>
+							{ t( `mood.${ m }` ) }
+						</option>
+					) ) }
 				</select>
 				<label class="check">
 					<input type="checkbox" checked={ filters.has_photo } onChange={ ( e ) => setFilters( { ...filters, has_photo: ( e.currentTarget as HTMLInputElement ).checked } ) } />
-					写真あり
+					{ t( 'timeline.with_photos' ) }
 				</label>
 			</div>
 
@@ -101,8 +102,8 @@ export function TimelineView() {
 					<EntryCard key={ card.date } card={ card } />
 				) ) }
 			</div>
-			{ ! loading && items.length === 0 && <p class="day-loading">該当する日記はありません。</p> }
-			{ loading && <p class="day-loading" role="status">読み込み中…</p> }
+			{ ! loading && items.length === 0 && <p class="day-loading">{ t( 'timeline.none' ) }</p> }
+			{ loading && <p class="day-loading" role="status">{ t( 'common.loading' ) }</p> }
 			<div ref={ sentinel } />
 		</div>
 	);

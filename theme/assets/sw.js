@@ -107,7 +107,8 @@ async function navigation( request ) {
 		if ( cached ) {
 			return cached;
 		}
-		return new Response( '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Hibi</title><p style="font-family:sans-serif;padding:24px">オフラインです。接続してからもう一度開いてください。</p>', {
+		const text = String( CFG.offline ).replace( /[&<>]/g, ( c ) => ( { '&': '&amp;', '<': '&lt;', '>': '&gt;' } )[ c ] );
+		return new Response( '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Hibi</title><p style="font-family:sans-serif;padding:24px">' + text + '</p>', {
 			status: 503,
 			headers: { 'Content-Type': 'text/html; charset=utf-8' },
 		} );

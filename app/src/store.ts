@@ -1,16 +1,9 @@
 import { signal } from '@preact/signals';
+import { boot } from './boot';
 import { journalDate } from './date';
-import type { Bootstrap, Entry, Settings, Stats } from './types';
+import type { Entry, Settings, Stats } from './types';
 
-function readBootstrap(): Bootstrap {
-	const el = document.getElementById( 'hibi-bootstrap' );
-	if ( ! el || ! el.textContent ) {
-		throw new Error( 'Missing bootstrap data' );
-	}
-	return JSON.parse( el.textContent ) as Bootstrap;
-}
-
-export const boot = readBootstrap();
+export { boot };
 
 export const settings = signal<Settings>( boot.settings );
 export const stats = signal<Stats>( boot.stats );

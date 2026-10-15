@@ -23,13 +23,17 @@ export function configureApi( boot: Bootstrap ): void {
 	loginUrl = boot.api.login_url;
 }
 
-/** Works for both /wp-json/hibi/v1/ and ?rest_route=/hibi/v1/ roots. */
+/**
+ * Works for both /wp-json/hibi/v1/ and ?rest_route=/hibi/v1/ roots.
+ * `_locale=user` makes WordPress answer in the user's language.
+ */
 function url( path: string ): string {
-	const q = path.indexOf( '?' );
-	if ( q === -1 || root.indexOf( '?' ) === -1 ) {
-		return root + path;
+	const full = path + ( path.includes( '?' ) ? '&' : '?' ) + '_locale=user';
+	const q = full.indexOf( '?' );
+	if ( root.indexOf( '?' ) === -1 ) {
+		return root + full;
 	}
-	return root + path.slice( 0, q ) + '&' + path.slice( q + 1 );
+	return root + full.slice( 0, q ) + '&' + full.slice( q + 1 );
 }
 
 async function refreshNonce(): Promise<void> {
@@ -142,6 +146,21 @@ export const api = {
 	pushSubscribe: ( sub: PushSubscriptionJSON ) => request<{ subscribed: boolean }>( 'POST', 'push/subscribe', sub ),
 
 	pushUnsubscribe: ( endpoint: string ) => request<{ subscribed: boolean }>( 'DELETE', 'push/subscribe', { endpoint } ),
+
+	/** The whole journal as a ZIP. */
+	async exportZip(): Promise<Blob> {
+		const res = await fetch( url( 'export' ), { credentials: 'same-origin', cache: 'no-store', headers: { 'X-WP-Nonce': nonce } } );
+		if ( ! res.ok ) {
+			throw new ApiError( res.status, 'hibi_export', res.statusText );
+		}
+		return res.blob();
+	},
+
+	importFile( file: File ) {
+		const form = new FormData();
+		form.append( 'file', file, file.name );
+		return request<{ imported: number; skipped: number; photos: number; errors: string[] }>( 'POST', 'import', form );
+	},
 
 	pushTest: () => request<{ sent: number; failed: number; removed: number }>( 'POST', 'push/test' ),
 };

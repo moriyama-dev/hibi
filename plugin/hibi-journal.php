@@ -33,6 +33,7 @@ require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-query.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-search.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-weather.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-push.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-export.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-rest.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-login.php';
 

@@ -24,6 +24,10 @@ coverage/
 # translate.wordpress.org handles .po/.mo.
 *.po
 *.mo
+# The theme is not distributed on WordPress.org, so no language pack
+# reaches it: its Japanese translation ships with it.
+!theme/languages/ja.po
+!theme/languages/ja.mo
 
 # Development dependencies (the plugin ships its own vendor/ later)
 /vendor/

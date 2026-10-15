@@ -1,16 +1,17 @@
 import { href, route } from '../router';
+import { t } from '../i18n';
 
 const ITEMS = [
-	{ path: '/', label: '今日', match: [ 'day' ] },
-	{ path: '/calendar', label: '振り返り', match: [ 'calendar', 'timeline', 'on-this-day' ] },
-	{ path: '/search', label: '検索', match: [ 'search' ] },
-	{ path: '/settings', label: '設定', match: [ 'settings' ] },
+	{ path: '/', label: 'nav.today', match: [ 'day' ] },
+	{ path: '/calendar', label: 'nav.review', match: [ 'calendar', 'timeline', 'on-this-day' ] },
+	{ path: '/search', label: 'nav.search', match: [ 'search' ] },
+	{ path: '/settings', label: 'nav.settings', match: [ 'settings' ] },
 ];
 
 export function Nav() {
 	const current = route.value.name;
 	return (
-		<nav class="tabs" aria-label="メイン">
+		<nav class="tabs" aria-label={ t( 'nav.main' ) }>
 			<span class="brand" aria-hidden="true">
 				Hibi
 			</span>
@@ -22,7 +23,7 @@ export function Nav() {
 					class="tab"
 					aria-current={ item.match.includes( current ) ? 'page' : undefined }
 				>
-					{ item.label }
+					{ t( item.label ) }
 				</a>
 			) ) }
 		</nav>

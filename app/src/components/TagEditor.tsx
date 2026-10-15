@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { api } from '../api';
+import { t } from '../i18n';
 
 let suggestions: Promise<string[]> | null = null;
 
@@ -38,11 +39,11 @@ export function TagEditor( { tags, onChange }: Props ) {
 
 	return (
 		<div class="tag-editor">
-			<ul class="tags" aria-label="タグ">
+			<ul class="tags" aria-label={ t( 'tag.list' ) }>
 				{ tags.map( ( tag ) => (
 					<li key={ tag } class="tag">
 						#{ tag }
-						<button type="button" aria-label={ `${ tag } を外す` } onClick={ () => onChange( tags.filter( ( t ) => t !== tag ) ) }>
+						<button type="button" aria-label={ t( 'tag.remove', tag ) } onClick={ () => onChange( tags.filter( ( x ) => x !== tag ) ) }>
 							×
 						</button>
 					</li>
@@ -52,8 +53,8 @@ export function TagEditor( { tags, onChange }: Props ) {
 				type="text"
 				class="tag-input"
 				list="hibi-tag-list"
-				placeholder="タグを追加"
-				aria-label="タグを追加"
+				placeholder={ t( 'tag.add' ) }
+				aria-label={ t( 'tag.add' ) }
 				value={ text }
 				enterKeyHint="done"
 				onInput={ ( e ) => setText( ( e.currentTarget as HTMLInputElement ).value ) }

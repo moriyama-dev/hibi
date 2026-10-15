@@ -1,0 +1,833 @@
+# Copyright (C) 2026 Yoshiro Moriyama (Takumi Web Services)
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Hibi 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/moriyama-dev/hibi/issues\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-15T01:59:40+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: hibi\n"
+
+#. Theme Name of the theme
+#: style.css
+msgid "Hibi"
+msgstr ""
+
+#. Theme URI of the theme
+#: style.css
+msgid "https://github.com/moriyama-dev/hibi"
+msgstr ""
+
+#. Description of the theme
+#: style.css
+msgid "The writing app for the Hibi Journal plugin. Requires the Hibi Journal plugin."
+msgstr ""
+
+#. Author of the theme
+#: style.css
+msgid "Yoshiro Moriyama (Takumi Web Services)"
+msgstr ""
+
+#. Author URI of the theme
+#: style.css
+msgid "https://takumi.ca"
+msgstr ""
+
+#: functions.php:250
+msgid "You are offline. Connect and open the app again."
+msgstr ""
+
+#: functions.php:272
+msgid "A private daily journal."
+msgstr ""
+
+#: inc/strings.php:19
+msgid "Main"
+msgstr ""
+
+#: inc/strings.php:20
+msgid "Today"
+msgstr ""
+
+#: inc/strings.php:21
+msgid "Look back"
+msgstr ""
+
+#: inc/strings.php:22
+#: inc/strings.php:148
+msgid "Search"
+msgstr ""
+
+#: inc/strings.php:23
+#: inc/strings.php:156
+msgid "Settings"
+msgstr ""
+
+#: inc/strings.php:24
+msgid "Calendar"
+msgstr ""
+
+#: inc/strings.php:25
+#: inc/strings.php:139
+msgid "Timeline"
+msgstr ""
+
+#: inc/strings.php:26
+msgid "On this day"
+msgstr ""
+
+#: inc/strings.php:27
+msgid "Page not found"
+msgstr ""
+
+#: inc/strings.php:28
+msgid "Back to today's entry"
+msgstr ""
+
+#: inc/strings.php:31
+msgid "Loading…"
+msgstr ""
+
+#: inc/strings.php:32
+msgid "Could not load."
+msgstr ""
+
+#: inc/strings.php:33
+msgid "Close"
+msgstr ""
+
+#: inc/strings.php:34
+msgid "Show more"
+msgstr ""
+
+#: inc/strings.php:35
+msgid "Searching…"
+msgstr ""
+
+#: inc/strings.php:36
+msgid "Nothing found."
+msgstr ""
+
+#: inc/strings.php:37
+msgid "Search failed."
+msgstr ""
+
+#: inc/strings.php:38
+msgid "Sending…"
+msgstr ""
+
+#: inc/strings.php:41
+msgid "Saved"
+msgstr ""
+
+#: inc/strings.php:42
+msgid "Waiting to save"
+msgstr ""
+
+#: inc/strings.php:43
+msgid "Saving…"
+msgstr ""
+
+#: inc/strings.php:44
+msgid "Offline (will retry)"
+msgstr ""
+
+#: inc/strings.php:45
+msgid "Not saved (will retry)"
+msgstr ""
+
+#: inc/strings.php:46
+msgid "Changed on another device"
+msgstr ""
+
+#: inc/strings.php:49
+msgid "Today's mood"
+msgstr ""
+
+#: inc/strings.php:50
+msgid "Awful"
+msgstr ""
+
+#: inc/strings.php:51
+msgid "Bad"
+msgstr ""
+
+#: inc/strings.php:52
+msgid "Okay"
+msgstr ""
+
+#: inc/strings.php:53
+msgid "Good"
+msgstr ""
+
+#: inc/strings.php:54
+msgid "Great"
+msgstr ""
+
+#. translators: %s: mood name, e.g. "Good".
+#: inc/strings.php:56
+#, php-format
+msgid "Mood: %s"
+msgstr ""
+
+#: inc/strings.php:59
+msgid "Previous day"
+msgstr ""
+
+#: inc/strings.php:60
+msgid "Next day"
+msgstr ""
+
+#: inc/strings.php:61
+msgid "Go to today"
+msgstr ""
+
+#. translators: %d: number of days in a row with an entry.
+#: inc/strings.php:63
+#, php-format
+msgid "%d-day streak"
+msgstr ""
+
+#: inc/strings.php:64
+msgid "Entry"
+msgstr ""
+
+#: inc/strings.php:65
+msgid "How was your day?"
+msgstr ""
+
+#: inc/strings.php:66
+#: inc/strings.php:68
+msgid "Write about this day"
+msgstr ""
+
+#: inc/strings.php:67
+msgid "Edit"
+msgstr ""
+
+#: inc/strings.php:69
+msgid "This day's entry could not be loaded. You may be offline."
+msgstr ""
+
+#: inc/strings.php:70
+msgid "Write anyway (sent when you are back online)"
+msgstr ""
+
+#: inc/strings.php:71
+msgid "Nothing was written on this day."
+msgstr ""
+
+#: inc/strings.php:72
+msgid "Writing tools"
+msgstr ""
+
+#: inc/strings.php:73
+#: inc/strings.php:162
+msgid "Time"
+msgstr ""
+
+#: inc/strings.php:74
+#: inc/strings.php:106
+msgid "Tags"
+msgstr ""
+
+#. translators: %s: number of characters, already formatted.
+#: inc/strings.php:76
+#, php-format
+msgid "%s chars"
+msgstr ""
+
+#. translators: %s: number of characters, already formatted.
+#: inc/strings.php:78
+#, php-format
+msgid "%s characters"
+msgstr ""
+
+#: inc/strings.php:79
+msgid "Tap to use this question"
+msgstr ""
+
+#: inc/strings.php:82
+msgid "This entry was changed on another device."
+msgstr ""
+
+#: inc/strings.php:83
+msgid "Choose which version to keep. Saving is paused until you choose, and neither version is lost."
+msgstr ""
+
+#: inc/strings.php:84
+msgid "Keep this device's version"
+msgstr ""
+
+#: inc/strings.php:85
+msgid "Keep the other version"
+msgstr ""
+
+#: inc/strings.php:86
+msgid "Keep both, joined"
+msgstr ""
+
+#: inc/strings.php:89
+msgid "Days changed on another device:"
+msgstr ""
+
+#. translators: %d: number of days with unsent changes.
+#: inc/strings.php:91
+#, php-format
+msgid "%d day(s) waiting to be sent. They will be sent when you are back online."
+msgstr ""
+
+#: inc/strings.php:94
+#: inc/strings.php:98
+msgid "Photo"
+msgstr ""
+
+#. translators: %d: number of photos.
+#: inc/strings.php:96
+#, php-format
+msgid "Photos: %d"
+msgstr ""
+
+#: inc/strings.php:97
+msgid "Enlarge photo"
+msgstr ""
+
+#: inc/strings.php:99
+msgid "Original size"
+msgstr ""
+
+#: inc/strings.php:100
+msgid "Delete"
+msgstr ""
+
+#: inc/strings.php:101
+msgid "Delete this photo? This cannot be undone."
+msgstr ""
+
+#: inc/strings.php:102
+msgid "The photo could not be deleted. Check your connection."
+msgstr ""
+
+#: inc/strings.php:103
+msgid "The photo could not be added."
+msgstr ""
+
+#. translators: %s: tag name.
+#: inc/strings.php:108
+#, php-format
+msgid "Remove %s"
+msgstr ""
+
+#: inc/strings.php:109
+msgid "Add a tag"
+msgstr ""
+
+#: inc/strings.php:112
+msgid "Previous month"
+msgstr ""
+
+#: inc/strings.php:113
+msgid "Next month"
+msgstr ""
+
+#. translators: %s: date, e.g. "October 14".
+#: inc/strings.php:115
+#, php-format
+msgid "%s, written"
+msgstr ""
+
+#. translators: 1: date, e.g. "October 14", 2: mood name.
+#: inc/strings.php:117
+#, php-format
+msgid "%1$s, written, mood: %2$s"
+msgstr ""
+
+#: inc/strings.php:118
+msgid "Days written"
+msgstr ""
+
+#: inc/strings.php:119
+msgid "Characters"
+msgstr ""
+
+#: inc/strings.php:120
+msgid "Longest streak"
+msgstr ""
+
+#. translators: %s: year, already formatted.
+#: inc/strings.php:122
+#, php-format
+msgid "Entries in %s"
+msgstr ""
+
+#. translators: %d: number of days.
+#: inc/strings.php:124
+#, php-format
+msgid "%d days"
+msgstr ""
+
+#: inc/strings.php:127
+msgid "A year ago today"
+msgstr ""
+
+#. translators: %d: number of years.
+#: inc/strings.php:129
+#, php-format
+msgid "%d years ago today"
+msgstr ""
+
+#. translators: %s: month and day, e.g. "October 14".
+#: inc/strings.php:131
+#, php-format
+msgid "Entries on %s"
+msgstr ""
+
+#: inc/strings.php:132
+msgid "No entries on this day in past years yet."
+msgstr ""
+
+#. translators: %s: year, already formatted.
+#: inc/strings.php:134
+#, php-format
+msgid "A year ago (%s)"
+msgstr ""
+
+#. translators: 1: number of years, 2: year, already formatted.
+#: inc/strings.php:136
+#, php-format
+msgid "%1$d years ago (%2$s)"
+msgstr ""
+
+#: inc/strings.php:140
+msgid "Filter by tag"
+msgstr ""
+
+#: inc/strings.php:141
+msgid "All tags"
+msgstr ""
+
+#: inc/strings.php:142
+msgid "Filter by mood"
+msgstr ""
+
+#: inc/strings.php:143
+msgid "All moods"
+msgstr ""
+
+#: inc/strings.php:144
+msgid "With photos"
+msgstr ""
+
+#: inc/strings.php:145
+msgid "No matching entries."
+msgstr ""
+
+#: inc/strings.php:149
+msgid "Search your journal"
+msgstr ""
+
+#. translators: %d: number of results.
+#: inc/strings.php:151
+#, php-format
+msgid "%d result(s)"
+msgstr ""
+
+#. translators: %d: number of results shown so far.
+#: inc/strings.php:153
+#, php-format
+msgid "%d+ results"
+msgstr ""
+
+#: inc/strings.php:157
+msgid "Start of the day"
+msgstr ""
+
+#: inc/strings.php:158
+msgid "Entries written before this time belong to the previous day."
+msgstr ""
+
+#: inc/strings.php:159
+msgid "Reminder"
+msgstr ""
+
+#: inc/strings.php:160
+msgid "One notification, only on days you have not written by this time."
+msgstr ""
+
+#: inc/strings.php:161
+msgid "Send reminders"
+msgstr ""
+
+#: inc/strings.php:163
+msgid "Send a test notification"
+msgstr ""
+
+#: inc/strings.php:164
+msgid "Stop notifications on this device"
+msgstr ""
+
+#: inc/strings.php:165
+msgid "On iPhone, notifications arrive only in the app added to the Home Screen from Safari (iOS 16.4 or later)."
+msgstr ""
+
+#: inc/strings.php:166
+msgid "Notifications could not be set up."
+msgstr ""
+
+#: inc/strings.php:167
+msgid "A test notification was sent."
+msgstr ""
+
+#: inc/strings.php:168
+msgid "There is no device to send to."
+msgstr ""
+
+#: inc/strings.php:169
+msgid "The test notification could not be sent."
+msgstr ""
+
+#: inc/strings.php:170
+msgid "This browser does not support notifications."
+msgstr ""
+
+#: inc/strings.php:171
+msgid "Notifications work only when the site is opened over https."
+msgstr ""
+
+#: inc/strings.php:172
+msgid "Notifications are blocked. Allow them in the browser’s site settings."
+msgstr ""
+
+#: inc/strings.php:173
+msgid "This device does not receive notifications."
+msgstr ""
+
+#: inc/strings.php:174
+msgid "This device receives notifications."
+msgstr ""
+
+#: inc/strings.php:175
+msgid "Weather"
+msgstr ""
+
+#: inc/strings.php:176
+msgid "Record the day's weather automatically"
+msgstr ""
+
+#. translators: %s: place name.
+#: inc/strings.php:178
+#, php-format
+msgid "Place: %s"
+msgstr ""
+
+#: inc/strings.php:179
+msgid "not set"
+msgstr ""
+
+#: inc/strings.php:180
+msgid "City"
+msgstr ""
+
+#: inc/strings.php:181
+msgid "City name (e.g. Toronto)"
+msgstr ""
+
+#: inc/strings.php:182
+msgid "Find"
+msgstr ""
+
+#: inc/strings.php:183
+msgid "Current location"
+msgstr ""
+
+#: inc/strings.php:184
+msgid "This device cannot share its location."
+msgstr ""
+
+#: inc/strings.php:185
+msgid "Getting your location…"
+msgstr ""
+
+#: inc/strings.php:186
+msgid "Your location could not be found. Search by city name instead."
+msgstr ""
+
+#: inc/strings.php:187
+msgid "Weather comes from Open-Meteo (open-meteo.com), fetched through this server."
+msgstr ""
+
+#: inc/strings.php:188
+msgid "Display"
+msgstr ""
+
+#: inc/strings.php:189
+msgid "Text size"
+msgstr ""
+
+#: inc/strings.php:190
+msgid "Small"
+msgstr ""
+
+#: inc/strings.php:191
+msgid "Medium"
+msgstr ""
+
+#: inc/strings.php:192
+msgid "Large"
+msgstr ""
+
+#: inc/strings.php:193
+msgid "Typeface for reading"
+msgstr ""
+
+#: inc/strings.php:194
+msgid "Sans-serif"
+msgstr ""
+
+#: inc/strings.php:195
+msgid "Serif"
+msgstr ""
+
+#: inc/strings.php:196
+msgid "Colours"
+msgstr ""
+
+#: inc/strings.php:197
+msgid "Match the device"
+msgstr ""
+
+#: inc/strings.php:198
+msgid "Light"
+msgstr ""
+
+#: inc/strings.php:199
+msgid "Dark"
+msgstr ""
+
+#: inc/strings.php:200
+msgid "Show a question on empty days"
+msgstr ""
+
+#: inc/strings.php:201
+msgid "Add to the Home Screen"
+msgstr ""
+
+#: inc/strings.php:202
+msgid "iPhone and iPad: open this site in Safari, tap the Share button, then “Add to Home Screen”."
+msgstr ""
+
+#: inc/strings.php:203
+msgid "Android: open the browser menu and choose “Install app” or “Add to Home screen”."
+msgstr ""
+
+#: inc/strings.php:204
+msgid "Install the app"
+msgstr ""
+
+#: inc/strings.php:205
+msgid "Your data"
+msgstr ""
+
+#: inc/strings.php:206
+msgid "Download everything (ZIP)"
+msgstr ""
+
+#: inc/strings.php:207
+msgid "Every entry as Markdown and JSON, with photos. Keep a copy somewhere safe."
+msgstr ""
+
+#: inc/strings.php:208
+msgid "Import a Hibi ZIP or JSON file"
+msgstr ""
+
+#: inc/strings.php:209
+msgid "Days that already have an entry are skipped."
+msgstr ""
+
+#. translators: 1: number of entries imported, 2: number skipped.
+#: inc/strings.php:211
+#, php-format
+msgid "Imported %1$d, skipped %2$d."
+msgstr ""
+
+#: inc/strings.php:212
+msgid "The file could not be imported."
+msgstr ""
+
+#: inc/strings.php:213
+msgid "Log out"
+msgstr ""
+
+#: inc/strings.php:214
+msgid "Some changes have not been sent yet. Log out anyway? They stay on this device and are sent the next time you log in here."
+msgstr ""
+
+#: inc/strings.php:215
+msgid "Saved."
+msgstr ""
+
+#: inc/strings.php:218
+msgid "Clear"
+msgstr ""
+
+#: inc/strings.php:219
+msgid "Partly cloudy"
+msgstr ""
+
+#: inc/strings.php:220
+msgid "Cloudy"
+msgstr ""
+
+#: inc/strings.php:221
+msgid "Fog"
+msgstr ""
+
+#: inc/strings.php:222
+msgid "Drizzle"
+msgstr ""
+
+#: inc/strings.php:223
+msgid "Rain"
+msgstr ""
+
+#: inc/strings.php:224
+msgid "Snow"
+msgstr ""
+
+#: inc/strings.php:225
+msgid "Thunderstorm"
+msgstr ""
+
+#: inc/strings.php:236
+msgid "What made you smile today?"
+msgstr ""
+
+#: inc/strings.php:237
+msgid "What took most of your time today?"
+msgstr ""
+
+#: inc/strings.php:238
+msgid "Who did you talk to today?"
+msgstr ""
+
+#: inc/strings.php:239
+msgid "What did you eat today that you want to remember?"
+msgstr ""
+
+#: inc/strings.php:240
+msgid "What went better than expected?"
+msgstr ""
+
+#: inc/strings.php:241
+msgid "What would you do differently if you had today again?"
+msgstr ""
+
+#: inc/strings.php:242
+msgid "What did you learn today?"
+msgstr ""
+
+#: inc/strings.php:243
+msgid "What are you looking forward to tomorrow?"
+msgstr ""
+
+#: inc/strings.php:244
+msgid "What tired you out today?"
+msgstr ""
+
+#: inc/strings.php:245
+msgid "What is one small thing you are grateful for?"
+msgstr ""
+
+#: inc/strings.php:246
+msgid "What did you notice on the way somewhere today?"
+msgstr ""
+
+#: inc/strings.php:247
+msgid "What did the children say or do today?"
+msgstr ""
+
+#: inc/strings.php:248
+msgid "What was the weather like, and how did it feel?"
+msgstr ""
+
+#: inc/strings.php:249
+msgid "What did you finish today?"
+msgstr ""
+
+#: inc/strings.php:250
+msgid "What is on your mind right now?"
+msgstr ""
+
+#: inc/strings.php:251
+msgid "What did you read, watch or listen to?"
+msgstr ""
+
+#: inc/strings.php:252
+msgid "What made you laugh?"
+msgstr ""
+
+#: inc/strings.php:253
+msgid "Was there a moment you felt calm today?"
+msgstr ""
+
+#: inc/strings.php:254
+msgid "What worried you, and how big does it feel now?"
+msgstr ""
+
+#: inc/strings.php:255
+msgid "What did you do for your body today?"
+msgstr ""
+
+#: inc/strings.php:256
+msgid "What surprised you today?"
+msgstr ""
+
+#: inc/strings.php:257
+msgid "Who helped you, or whom did you help?"
+msgstr ""
+
+#: inc/strings.php:258
+msgid "What do you want to remember about this week?"
+msgstr ""
+
+#: inc/strings.php:259
+msgid "What did you put off, and why?"
+msgstr ""
+
+#: inc/strings.php:260
+msgid "Where were you at three o’clock this afternoon?"
+msgstr ""
+
+#: inc/strings.php:261
+msgid "What sound, smell or colour stood out today?"
+msgstr ""
+
+#: inc/strings.php:262
+msgid "What would you tell yourself a year from now?"
+msgstr ""
+
+#: inc/strings.php:263
+msgid "What was the best part of the evening?"
+msgstr ""
+
+#: inc/strings.php:264
+msgid "What is something you want to try soon?"
+msgstr ""
+
+#: inc/strings.php:265
+msgid "Describe today in three words, then explain one."
+msgstr ""
+
+#: index.php:22
+msgid "Hibi needs JavaScript to run."
+msgstr ""
+
+#: index.php:26
+msgid "Please activate the Hibi Journal plugin."
+msgstr ""

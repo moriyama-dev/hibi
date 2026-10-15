@@ -327,6 +327,26 @@ class Hibi_Rest {
 
 		register_rest_route(
 			self::NAMESPACE_V1,
+			'/export',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'export' ),
+				'permission_callback' => $auth,
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/import',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( __CLASS__, 'import' ),
+				'permission_callback' => $auth,
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_V1,
 			'/push/test',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -602,6 +622,44 @@ class Hibi_Rest {
 		$params = (array) $request->get_json_params();
 		Hibi_Push::unsubscribe( get_current_user_id(), isset( $params['endpoint'] ) ? (string) $params['endpoint'] : '' );
 		return self::no_store( rest_ensure_response( array( 'subscribed' => false ) ) );
+	}
+
+	/**
+	 * Sends the whole journal as a ZIP download. The file is streamed
+	 * directly: a REST response cannot carry a binary body.
+	 *
+	 * @return WP_Error|void
+	 */
+	public static function export() {
+		$path = Hibi_Export::build_zip( get_current_user_id() );
+		if ( is_wp_error( $path ) ) {
+			return $path;
+		}
+		$name = sprintf( 'hibi-%s.zip', wp_date( 'Y-m-d' ) );
+		nocache_headers();
+		header( 'Content-Type: application/zip' );
+		header( 'Content-Disposition: attachment; filename="' . $name . '"' );
+		header( 'Content-Length: ' . filesize( $path ) );
+		header( 'X-Content-Type-Options: nosniff' );
+		readfile( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Streams the export.
+		wp_delete_file( $path );
+		exit;
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public static function import( WP_REST_Request $request ) {
+		$files = $request->get_file_params();
+		if ( empty( $files['file']['tmp_name'] ) || ! is_uploaded_file( $files['file']['tmp_name'] ) ) {
+			return new WP_Error( 'hibi_import_file', __( 'No file was sent.', 'hibi-journal' ), array( 'status' => 400 ) );
+		}
+		$result = Hibi_Export::import( get_current_user_id(), $files['file']['tmp_name'] );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		return self::no_store( rest_ensure_response( $result ) );
 	}
 
 	/**

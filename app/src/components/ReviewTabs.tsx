@@ -1,17 +1,18 @@
 import { href, route } from '../router';
+import { t } from '../i18n';
 
 const TABS = [
-	{ name: 'calendar', path: '/calendar', label: 'カレンダー' },
-	{ name: 'timeline', path: '/timeline', label: 'タイムライン' },
-	{ name: 'on-this-day', path: '/on-this-day', label: '1年前' },
+	{ name: 'calendar', path: '/calendar', label: 'review.calendar' },
+	{ name: 'timeline', path: '/timeline', label: 'review.timeline' },
+	{ name: 'on-this-day', path: '/on-this-day', label: 'review.otd' },
 ];
 
 export function ReviewTabs() {
 	return (
-		<nav class="subtabs" aria-label="振り返り">
-			{ TABS.map( ( t ) => (
-				<a key={ t.name } href={ href( t.path ) } data-nav aria-current={ route.value.name === t.name ? 'page' : undefined }>
-					{ t.label }
+		<nav class="subtabs" aria-label={ t( 'nav.review' ) }>
+			{ TABS.map( ( tab ) => (
+				<a key={ tab.name } href={ href( tab.path ) } data-nav aria-current={ route.value.name === tab.name ? 'page' : undefined }>
+					{ t( tab.label ) }
 				</a>
 			) ) }
 		</nav>

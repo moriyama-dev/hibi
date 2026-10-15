@@ -14,6 +14,8 @@ define( 'HIBI_THEME_VERSION', '0.1.0' );
 define( 'HIBI_THEME_DIR', get_template_directory() );
 define( 'HIBI_THEME_URL', get_template_directory_uri() );
 
+require_once HIBI_THEME_DIR . '/inc/strings.php';
+
 /**
  * App routes, without the leading slash. "d/<date>" is handled separately.
  */
@@ -25,6 +27,7 @@ add_filter( 'query_vars', 'hibi_theme_query_vars' );
 add_action( 'after_switch_theme', 'hibi_theme_flush_rewrites' );
 add_action( 'switch_theme', 'flush_rewrite_rules' );
 add_action( 'wp_enqueue_scripts', 'hibi_theme_assets', 20 );
+add_action( 'template_redirect', 'hibi_theme_use_user_locale', 1 );
 add_action( 'template_redirect', 'hibi_theme_not_found_status' );
 add_action( 'parse_request', 'hibi_theme_serve_app_files', 0 );
 add_action( 'init', 'hibi_theme_maybe_flush_rewrites', 20 );
@@ -70,6 +73,25 @@ function hibi_theme_maybe_flush_rewrites() {
 		flush_rewrite_rules( false );
 		update_option( 'hibi_theme_rewrite_version', HIBI_THEME_VERSION . '-2', false );
 	}
+}
+
+/**
+ * The app speaks the language chosen in the user's profile, not the
+ * site's language.
+ */
+function hibi_theme_use_user_locale() {
+	if ( is_user_logged_in() ) {
+		switch_to_user_locale( get_current_user_id() );
+	}
+}
+
+/**
+ * The user's locale as a BCP 47 tag for Intl, e.g. "ja" or "en-US".
+ *
+ * @return string
+ */
+function hibi_theme_bcp47_locale() {
+	return str_replace( '_', '-', determine_locale() );
 }
 
 /**
@@ -148,7 +170,12 @@ function hibi_theme_print_bootstrap() {
 	if ( ! function_exists( 'hibi_is_active' ) || ! is_user_logged_in() ) {
 		return;
 	}
-	$data = Hibi_Rest::bootstrap_data();
+	$data             = Hibi_Rest::bootstrap_data();
+	$data['locale']   = hibi_theme_bcp47_locale();
+	$data['i18n']     = hibi_theme_strings();
+	$data['prompts']  = hibi_theme_prompts();
+	// wp_logout_url() returns an HTML-escaped URL; the app needs it raw.
+	$data['logout_url'] = html_entity_decode( wp_logout_url( wp_login_url() ), ENT_QUOTES );
 	printf(
 		'<script type="application/json" id="hibi-bootstrap">%s</script>' . "\n",
 		wp_json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON with HTML-significant characters hex-escaped.
@@ -216,7 +243,11 @@ function hibi_theme_send_service_worker() {
 	$source   = HIBI_THEME_DIR . '/assets/sw.js';
 	$precache = hibi_theme_precache();
 	$version  = substr( md5( HIBI_THEME_VERSION . implode( ',', $precache ) . filemtime( $source ) ), 0, 12 );
-	$config   = array(
+	if ( is_user_logged_in() ) {
+		switch_to_user_locale( get_current_user_id() );
+	}
+	$config = array(
+		'offline'  => __( 'You are offline. Connect and open the app again.', 'hibi' ),
 		'version'  => $version,
 		'home'     => hibi_theme_home_path(),
 		'precache' => $precache,

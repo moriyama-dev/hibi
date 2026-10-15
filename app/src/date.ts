@@ -2,6 +2,8 @@
 // these run only when the app has to work it out itself, e.g. offline or
 // after the page stayed open past the day boundary.
 
+import { locale } from './i18n';
+
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export function isDate( value: string ): boolean {
@@ -50,18 +52,45 @@ export function shiftDate( date: string, days: number ): string {
 	return new Date( Date.UTC( y, m - 1, d + days ) ).toISOString().slice( 0, 10 );
 }
 
-const WEEKDAYS = [ '日', '月', '火', '水', '木', '金', '土' ];
-
-/** "10月14日（水）" */
-export function dayLabel( date: string ): string {
+/** Noon UTC of a calendar date: formatting it in UTC never shifts the day. */
+function utc( date: string ): Date {
 	const [ y, m, d ] = date.split( '-' ).map( Number );
-	const weekday = WEEKDAYS[ new Date( Date.UTC( y, m - 1, d ) ).getUTCDay() ];
-	return `${ m }月${ d }日（${ weekday }）`;
+	return new Date( Date.UTC( y, m - 1, d, 12 ) );
 }
 
-/** "2025年" when the date is not in the given year, otherwise "". */
+function format( date: string, options: Intl.DateTimeFormatOptions ): string {
+	return new Intl.DateTimeFormat( locale, { timeZone: 'UTC', ...options } ).format( utc( date ) );
+}
+
+/** e.g. "Wed, October 14", in the user's language. */
+export function dayLabel( date: string ): string {
+	return format( date, { month: 'long', day: 'numeric', weekday: 'short' } );
+}
+
+/** e.g. "October 14". */
+export function monthDayLabel( date: string ): string {
+	return format( date, { month: 'long', day: 'numeric' } );
+}
+
+/** e.g. "2025". */
+export function yearOnly( date: string ): string {
+	return format( date, { year: 'numeric' } );
+}
+
+/** The year when the date is not in the given year, otherwise "". */
 export function yearLabel( date: string, today: string ): string {
-	return date.slice( 0, 4 ) === today.slice( 0, 4 ) ? '' : `${ +date.slice( 0, 4 ) }年`;
+	return date.slice( 0, 4 ) === today.slice( 0, 4 ) ? '' : yearOnly( date );
+}
+
+/** e.g. "October 2026". */
+export function monthLabel( year: number, month: number ): string {
+	return format( `${ year }-${ String( month ).padStart( 2, '0' ) }-01`, { year: 'numeric', month: 'long' } );
+}
+
+/** Short weekday names, Sunday first. */
+export function weekdayNames(): string[] {
+	// 2026-10-04 is a Sunday.
+	return Array.from( { length: 7 }, ( _, i ) => format( shiftDate( '2026-10-04', i ), { weekday: 'narrow' } ) );
 }
 
 /** "14:32" in the site time zone. */

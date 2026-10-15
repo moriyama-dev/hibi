@@ -17,7 +17,7 @@ test.beforeEach( () => {
 test( 'today opens ready to write and keeps the text after a reload', async ( { page } ) => {
 	await page.goto( '/' );
 	const el = await body( page );
-	await expect( page.getByRole( 'heading', { level: 1 } ) ).toContainText( '日（' );
+	await expect( page.getByRole( 'heading', { level: 1 } ) ).toContainText( /\d+月\d+日/ );
 
 	await el.click();
 	await el.pressSequentially( '今日は晴れ。' );

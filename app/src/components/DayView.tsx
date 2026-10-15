@@ -13,14 +13,9 @@ import { PhotoButton, PhotoStrip } from './Photos';
 import { ReadView } from './ReadView';
 import { SaveStatus } from './SaveStatus';
 import { TagEditor } from './TagEditor';
+import { formatNumber, t } from '../i18n';
 
-const MOODS: { value: Mood; label: string }[] = [
-	{ value: 1, label: 'とても悪い' },
-	{ value: 2, label: '悪い' },
-	{ value: 3, label: 'ふつう' },
-	{ value: 4, label: '良い' },
-	{ value: 5, label: '最高' },
-];
+const MOODS: Mood[] = [ 1, 2, 3, 4, 5 ];
 
 const finePointer = window.matchMedia( '(pointer: fine)' ).matches;
 
@@ -80,25 +75,25 @@ export function DayView( { date, isToday }: Props ) {
 			{ entry && ! editing && (
 				<div class="reading">
 					{ entry.weather && <WeatherChip weather={ entry.weather } /> }
-					{ entry.mood && <p class="read-mood">気分：{ MOODS[ entry.mood - 1 ].label }</p> }
+					{ entry.mood && <p class="read-mood">{ t( 'mood.label', t( `mood.${ entry.mood }` ) ) }</p> }
 					<ReadView entry={ entry } />
 					<PhotoStrip date={ date } photos={ entry.photos } editable={ false } onChange={ () => undefined } />
 					{ entry.tags.length > 0 && <p class="read-tags">{ entry.tags.map( ( t ) => `#${ t }` ).join( ' ' ) }</p> }
 					<button type="button" class="edit-button" onClick={ () => setEditing( true ) }>
-						{ entry.exists ? '編集する' : 'この日のことを書く' }
+						{ entry.exists ? t( 'day.edit' ) : t( 'day.write_this' ) }
 					</button>
 				</div>
 			) }
 			{ ! entry && ! loadError && (
 				<p class="day-loading" role="status">
-					読み込み中…
+					{ t( 'common.loading' ) }
 				</p>
 			) }
 			{ loadError && (
 				<div class="day-loading" role="status">
-					<p>この日の日記を読み込めませんでした。オフラインかもしれません。</p>
+					<p>{ t( 'day.load_failed_offline' ) }</p>
 					<button type="button" class="edit-button" onClick={ writeOffline }>
-						このまま書く（接続が戻ったら送ります）
+						{ t( 'day.write_anyway' ) }
 					</button>
 				</div>
 			) }
@@ -122,11 +117,37 @@ function blankEntry( date: string, version: number ): Entry {
 	};
 }
 
+/** Translation key for a WMO weather code; matches Hibi_Weather::label(). */
+function weatherKey( code: number ): string {
+	if ( code === 0 ) {
+		return 'weather.clear';
+	}
+	if ( code <= 2 ) {
+		return 'weather.partly';
+	}
+	if ( code === 3 ) {
+		return 'weather.cloudy';
+	}
+	if ( code <= 48 ) {
+		return 'weather.fog';
+	}
+	if ( code <= 57 ) {
+		return 'weather.drizzle';
+	}
+	if ( code <= 67 || ( code >= 80 && code <= 82 ) ) {
+		return 'weather.rain';
+	}
+	if ( code <= 77 || code === 85 || code === 86 ) {
+		return 'weather.snow';
+	}
+	return code >= 95 ? 'weather.thunder' : 'weather.cloudy';
+}
+
 export function WeatherChip( { weather }: { weather: Weather } ) {
 	const temps = weather.temp_max !== null && weather.temp_min !== null ? ` ${ Math.round( weather.temp_max ) }°/${ Math.round( weather.temp_min ) }°` : '';
 	return (
 		<span class="chip weather">
-			{ weather.label }
+			{ t( weatherKey( weather.weather_code ) ) }
 			{ temps }
 		</span>
 	);
@@ -140,7 +161,7 @@ function DayHeader( { date, isToday }: Props ) {
 
 	return (
 		<header class="day-head">
-			<a class="day-nav" href={ dayHref( prev ) } data-nav aria-label="前の日" rel="prev">
+			<a class="day-nav" href={ dayHref( prev ) } data-nav aria-label={ t( 'day.prev' ) } rel="prev">
 				‹
 			</a>
 			<div class="day-title">
@@ -148,15 +169,15 @@ function DayHeader( { date, isToday }: Props ) {
 					{ yearLabel( date, today.value ) && <span class="day-year">{ yearLabel( date, today.value ) }</span> }
 					{ dayLabel( date ) }
 				</h1>
-				{ isToday && streak > 0 && <span class="streak">{ streak }日連続</span> }
+				{ isToday && streak > 0 && <span class="streak">{ t( 'day.streak', streak ) }</span> }
 				{ ! isToday && (
 					<a class="back-today" href={ dayHref( today.value ) } data-nav>
-						今日へ
+						{ t( 'day.back_today' ) }
 					</a>
 				) }
 			</div>
 			{ canNext ? (
-				<a class="day-nav" href={ dayHref( next ) } data-nav aria-label="次の日" rel="next">
+				<a class="day-nav" href={ dayHref( next ) } data-nav aria-label={ t( 'day.next' ) } rel="next">
 					›
 				</a>
 			) : (
@@ -338,6 +359,17 @@ function Editor( { entry, draft, isToday }: EditorProps ) {
 		afterProgrammaticEdit( el );
 	};
 
+	const usePrompt = () => {
+		const el = textarea.current;
+		if ( ! el ) {
+			return;
+		}
+		el.focus();
+		el.value = `> ${ promptFor( entry.date ) }\n\n${ el.value }`;
+		el.setSelectionRange( el.value.length, el.value.length );
+		afterProgrammaticEdit( el );
+	};
+
 	const changeTags = ( next: string[] ) => {
 		setTags( next );
 		saver.change( { tags: next } );
@@ -395,28 +427,28 @@ function Editor( { entry, draft, isToday }: EditorProps ) {
 				</p>
 			) }
 
-			<div class="moods" role="group" aria-label="今日の気分">
+			<div class="moods" role="group" aria-label={ t( 'mood.group' ) }>
 				{ MOODS.map( ( m ) => (
-					<button
-						type="button"
-						key={ m.value }
-						class={ `mood mood-${ m.value }` }
-						aria-pressed={ mood === m.value }
-						onClick={ () => toggleMood( m.value ) }
-					>
-						{ m.label }
+					<button type="button" key={ m } class={ `mood mood-${ m }` } aria-pressed={ mood === m } onClick={ () => toggleMood( m ) }>
+						{ t( `mood.${ m }` ) }
 					</button>
 				) ) }
 			</div>
 
+			{ isToday && chars === 0 && settings.value.prompts_enabled && boot.prompts.length > 0 && (
+				<button type="button" class="prompt" onClick={ usePrompt } title={ t( 'day.prompt_hint' ) }>
+					{ promptFor( entry.date ) }
+				</button>
+			) }
+
 			<label class="visually-hidden" for="hibi-body">
-				本文
+				{ t( 'day.body' ) }
 			</label>
 			<textarea
 				id="hibi-body"
 				ref={ textarea }
 				class="body"
-				placeholder={ isToday ? '今日はどんな日でしたか' : 'この日のことを書く' }
+				placeholder={ isToday ? t( 'day.placeholder_today' ) : t( 'day.placeholder_other' ) }
 				autocomplete="off"
 				spellcheck={ false }
 				onInput={ onInput }
@@ -427,21 +459,28 @@ function Editor( { entry, draft, isToday }: EditorProps ) {
 			<PhotoStrip date={ entry.date } photos={ photos } editable onChange={ changePhotos } />
 			{ isToday && <OnThisDayCard date={ entry.date } /> }
 
-			<div class="toolbar" role="toolbar" aria-label="書く道具">
+			<div class="toolbar" role="toolbar" aria-label={ t( 'day.tools' ) }>
 				<PhotoButton date={ entry.date } onAdded={ ( photo ) => changePhotos( [ ...photos, photo ] ) } />
 				<button type="button" class="tool" onClick={ insertTime } onMouseDown={ ( e ) => e.preventDefault() }>
-					時刻
+					{ t( 'day.time' ) }
 				</button>
 				<button type="button" class="tool" aria-pressed={ showTags } onClick={ () => setShowTags( ! showTags ) }>
-					タグ
+					{ t( 'day.tags' ) }
 				</button>
-				<span class="chars" aria-label={ `${ chars }文字` }>
-					{ chars.toLocaleString( 'ja-JP' ) }字
+				<span class="chars" aria-label={ t( 'day.chars_label', formatNumber( chars ) ) }>
+					{ t( 'day.chars', formatNumber( chars ) ) }
 				</span>
 				<SaveStatus state={ saver.state.value } />
 			</div>
 		</>
 	);
+}
+
+/** One question per calendar day, the same on every device. */
+function promptFor( date: string ): string {
+	const [ y, m, d ] = date.split( '-' ).map( Number );
+	const day = Math.floor( Date.UTC( y, m - 1, d ) / 86400000 );
+	return boot.prompts[ day % boot.prompts.length ];
 }
 
 /** Fallback for browsers without CSS field-sizing. */

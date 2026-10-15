@@ -115,6 +115,82 @@ class Hibi_CLI {
 	}
 
 	/**
+	 * Writes a user's whole journal to a ZIP file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * --user=<user>
+	 * : User ID or login.
+	 *
+	 * [--file=<file>]
+	 * : Where to write the ZIP. Defaults to hibi-<login>-<date>.zip here.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp hibi export --user=yoshi --file=/backups/journal.zip
+	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Options.
+	 */
+	public function export( $args, $assoc_args ) {
+		unset( $args );
+		$user = $this->user( $assoc_args['user'] );
+		$file = isset( $assoc_args['file'] ) ? $assoc_args['file'] : sprintf( 'hibi-%s-%s.zip', $user->user_login, wp_date( 'Y-m-d' ) );
+		$path = Hibi_Export::build_zip( $user->ID );
+		if ( is_wp_error( $path ) ) {
+			WP_CLI::error( $path->get_error_message() );
+		}
+		if ( ! copy( $path, $file ) ) {
+			wp_delete_file( $path );
+			WP_CLI::error( 'Could not write ' . $file );
+		}
+		wp_delete_file( $path );
+		WP_CLI::success( sprintf( 'Wrote %s (%s).', $file, size_format( filesize( $file ) ) ) );
+	}
+
+	/**
+	 * Imports a Hibi ZIP or entries.json. Days that already have an entry are skipped.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <file>
+	 * : The ZIP or JSON file.
+	 *
+	 * --user=<user>
+	 * : User ID or login.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp hibi import journal.zip --user=yoshi
+	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Options.
+	 */
+	public function import( $args, $assoc_args ) {
+		$user   = $this->user( $assoc_args['user'] );
+		$result = Hibi_Export::import( $user->ID, $args[0] );
+		if ( is_wp_error( $result ) ) {
+			WP_CLI::error( $result->get_error_message() );
+		}
+		foreach ( $result['errors'] as $error ) {
+			WP_CLI::warning( $error );
+		}
+		WP_CLI::success( sprintf( 'Imported %d, skipped %d, photos %d.', $result['imported'], $result['skipped'], $result['photos'] ) );
+	}
+
+	/**
+	 * @param string $value User ID or login.
+	 * @return WP_User
+	 */
+	private function user( $value ) {
+		$user = is_numeric( $value ) ? get_user_by( 'id', (int) $value ) : get_user_by( 'login', $value );
+		if ( ! $user ) {
+			WP_CLI::error( 'User not found: ' . $value );
+		}
+		return $user;
+	}
+
+	/**
 	 * Removes the seed user and all of its entries.
 	 */
 	private function clean() {

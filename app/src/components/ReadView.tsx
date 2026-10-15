@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { boot } from '../store';
 import type { Entry } from '../types';
+import { t } from '../i18n';
 
 const home = boot.api.home_path;
 const photoSrc = ( id: number ) => `${ home }?hibi_photo=${ id }&size=medium`;
@@ -21,7 +22,7 @@ export function ReadView( { entry }: { entry: Entry } ) {
 	}, [ entry.content ] );
 
 	if ( ! entry.content.trim() ) {
-		return <p class="read-empty">この日はまだ何も書かれていません。</p>;
+		return <p class="read-empty">{ t( 'day.read_empty' ) }</p>;
 	}
 	if ( html === null ) {
 		// Plain text until the formatter has loaded; nothing jumps.

@@ -5,6 +5,8 @@ import { today } from '../store';
 import type { Card } from '../types';
 import { EntryCard } from './EntryCard';
 import { ReviewTabs } from './ReviewTabs';
+import { monthDayLabel, yearOnly } from '../date';
+import { t } from '../i18n';
 
 const cache = new Map<string, Promise<Card[]>>();
 
@@ -44,10 +46,15 @@ export function OnThisDayCard( { date }: { date: string } ) {
 	}
 	return (
 		<a class="otd" href={ dayHref( card.date ) } data-nav>
-			<b>{ yearsAgo( card.date, date ) }年前の今日</b>
+			<b>{ yearsAgo( card.date, date ) === 1 ? t( 'otd.one' ) : t( 'otd.many', yearsAgo( card.date, date ) ) }</b>
 			<span>{ card.excerpt.split( '\n' )[ 0 ] }</span>
 		</a>
 	);
+}
+
+function heading( date: string ): string {
+	const years = yearsAgo( date, today.value );
+	return years === 1 ? t( 'otd.heading_one', yearOnly( date ) ) : t( 'otd.heading_many', years, yearOnly( date ) );
 }
 
 export function OnThisDayView() {
@@ -61,13 +68,13 @@ export function OnThisDayView() {
 		<div class="review">
 			<ReviewTabs />
 			<h1 class="review-title">
-				{ +today.value.slice( 5, 7 ) }月{ +today.value.slice( 8, 10 ) }日の記録
+				{ t( 'otd.title', monthDayLabel( today.value ) ) }
 			</h1>
-			{ items === null && <p class="day-loading" role="status">読み込み中…</p> }
-			{ items && items.length === 0 && <p class="day-loading">過去の同じ日の日記はまだありません。</p> }
+			{ items === null && <p class="day-loading" role="status">{ t( 'common.loading' ) }</p> }
+			{ items && items.length === 0 && <p class="day-loading">{ t( 'otd.empty' ) }</p> }
 			<div class="cards">
 				{ items?.map( ( card ) => (
-					<EntryCard key={ card.date } card={ card } heading={ `${ yearsAgo( card.date, today.value ) }年前（${ card.date.slice( 0, 4 ) }年）` } />
+					<EntryCard key={ card.date } card={ card } heading={ heading( card.date ) } />
 				) ) }
 			</div>
 		</div>

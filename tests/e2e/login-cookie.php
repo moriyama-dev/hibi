@@ -22,6 +22,8 @@ if ( ! $hibi_user ) {
 		)
 	);
 	update_user_meta( $hibi_id, '_hibi_e2e', 1 );
+	// The tests read the Japanese interface.
+	update_user_meta( $hibi_id, 'locale', 'ja' );
 	$hibi_user = get_user_by( 'id', $hibi_id );
 } elseif ( ! get_user_meta( $hibi_user->ID, '_hibi_e2e', true ) ) {
 	fwrite( STDERR, "hibi-e2e exists but was not created by the tests.\n" );

@@ -4,9 +4,10 @@ import { dayHref } from '../router';
 import { today } from '../store';
 import type { MonthDay } from '../types';
 import { ReviewTabs } from './ReviewTabs';
+import { monthDayLabel, monthLabel, weekdayNames, yearOnly } from '../date';
+import { formatNumber, t } from '../i18n';
 
-const DOW = [ '日', '月', '火', '水', '木', '金', '土' ];
-const MOOD_NAMES = [ '', 'とても悪い', '悪い', 'ふつう', '良い', '最高' ];
+const DOW = weekdayNames();
 
 function pad( n: number ): string {
 	return String( n ).padStart( 2, '0' );
@@ -64,20 +65,20 @@ export function CalendarView() {
 		<div class="review">
 			<ReviewTabs />
 			<header class="month-head">
-				<button type="button" class="day-nav" onClick={ () => move( -1 ) } aria-label="前の月">
+				<button type="button" class="day-nav" onClick={ () => move( -1 ) } aria-label={ t( 'cal.prev_month' ) }>
 					‹
 				</button>
 				<h1>
-					{ year }年{ month }月
+					{ monthLabel( year, month ) }
 				</h1>
-				<button type="button" class="day-nav" onClick={ () => move( 1 ) } aria-label="次の月" disabled={ isCurrentMonth }>
+				<button type="button" class="day-nav" onClick={ () => move( 1 ) } aria-label={ t( 'cal.next_month' ) } disabled={ isCurrentMonth }>
 					›
 				</button>
 			</header>
 
-			{ failed && <p class="day-loading">読み込めませんでした。</p> }
+			{ failed && <p class="day-loading">{ t( 'common.load_failed' ) }</p> }
 
-			<div class="calendar" role="grid" aria-label={ `${ year }年${ month }月` } aria-busy={ ! days && ! failed }>
+			<div class="calendar" role="grid" aria-label={ monthLabel( year, month ) } aria-busy={ ! days && ! failed }>
 				{ DOW.map( ( d, i ) => (
 					<span key={ d } class={ `cal-dow${ i === 0 ? ' is-sun' : '' }` } role="columnheader">
 						{ d }
@@ -90,7 +91,8 @@ export function CalendarView() {
 					const date = `${ year }-${ pad( month ) }-${ pad( i + 1 ) }`;
 					const info = days?.[ date ];
 					const future = date > today.value;
-					const label = `${ month }月${ i + 1 }日${ info ? `、書いた日${ info.mood ? `、気分 ${ MOOD_NAMES[ info.mood ] }` : '' }` : '' }`;
+					const name = monthDayLabel( date );
+					const label = ! info ? name : info.mood ? t( 'cal.written_mood', name, t( `mood.${ info.mood }` ) ) : t( 'cal.written', name );
 					const cls = `cal-day${ date === today.value ? ' is-today' : '' }${ info ? ' has-entry' : '' }`;
 					const dot = <span class={ `cal-dot level-${ info ? Math.max( 1, info.level ) : 0 }${ info?.mood ? ` mood-bg-${ info.mood }` : '' }` } />;
 					return future ? (
@@ -108,15 +110,15 @@ export function CalendarView() {
 
 			<dl class="month-stats">
 				<div>
-					<dt>書いた日</dt>
+					<dt>{ t( 'stats.days' ) }</dt>
 					<dd>{ written.length }</dd>
 				</div>
 				<div>
-					<dt>文字</dt>
-					<dd>{ chars.toLocaleString( 'ja-JP' ) }</dd>
+					<dt>{ t( 'stats.chars' ) }</dt>
+					<dd>{ formatNumber( chars ) }</dd>
 				</div>
 				<div>
-					<dt>最長連続</dt>
+					<dt>{ t( 'stats.longest' ) }</dt>
 					<dd>{ longestRun( written ) }</dd>
 				</div>
 			</dl>
@@ -157,9 +159,9 @@ function YearHeatmap( { year }: { year: number } ) {
 	const count = days ? Object.keys( days ).length : 0;
 
 	return (
-		<section class="heatmap-wrap" aria-label={ `${ year }年の記録` }>
+		<section class="heatmap-wrap" aria-label={ t( 'heat.label', yearOnly( `${ year }-01-01` ) ) }>
 			<h2>
-				{ year }年　<span>{ count }日</span>
+				{ yearOnly( `${ year }-01-01` ) } <span>{ t( 'heat.days', count ) }</span>
 			</h2>
 			<div class="heatmap" aria-hidden="true">
 				{ cells.map( ( c, i ) => (

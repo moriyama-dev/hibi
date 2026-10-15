@@ -112,7 +112,7 @@ test( 'weather place from the settings fills in today', async ( { page } ) => {
 	await page.getByRole( 'button', { name: '探す' } ).click();
 	const saved = page.waitForResponse( ( r ) => r.request().method() === 'PUT' && r.url().includes( 'settings' ) );
 	await page.locator( '.places button' ).first().click();
-	await expect( page.locator( '.settings' ) ).toContainText( '場所：トロント、オンタリオ州' );
+	await expect( page.locator( '.settings' ) ).toContainText( '場所：トロント, オンタリオ州' );
 	expect( ( await saved ).status() ).toBe( 200 );
 
 	await page.goto( '/' );

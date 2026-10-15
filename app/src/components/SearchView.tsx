@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { api } from '../api';
-import { dayLabel, yearLabel } from '../date';
+import { dayLabel, yearOnly } from '../date';
 import { dayHref } from '../router';
-import { today } from '../store';
 import type { SearchItem } from '../types';
 import { MoodDot } from './EntryCard';
+import { t } from '../i18n';
 
 const DEBOUNCE_MS = 300;
 
@@ -61,21 +61,21 @@ export function SearchView() {
 
 	return (
 		<div class="search">
-			<h1 class="visually-hidden">検索</h1>
+			<h1 class="visually-hidden">{ t( 'search.title' ) }</h1>
 			<input
 				ref={ input }
 				type="search"
 				class="search-input"
-				placeholder="日記を検索"
-				aria-label="日記を検索"
+				placeholder={ t( 'search.placeholder' ) }
+				aria-label={ t( 'search.placeholder' ) }
 				value={ query }
 				enterKeyHint="search"
 				onInput={ ( e ) => setQuery( ( e.currentTarget as HTMLInputElement ).value ) }
 			/>
 			<p class="search-state" role="status" aria-live="polite">
-				{ state === 'loading' && '検索中…' }
-				{ state === 'error' && '検索できませんでした。' }
-				{ state === 'done' && ( items.length ? `${ items.length }${ cursor ? '件以上' : '件' }` : '見つかりませんでした。' ) }
+				{ state === 'loading' && t( 'common.searching' ) }
+				{ state === 'error' && t( 'common.search_failed' ) }
+				{ state === 'done' && ( items.length ? t( cursor ? 'search.count_more' : 'search.count', items.length ) : t( 'common.no_results' ) ) }
 			</p>
 			<ol class="results">
 				{ items.map( ( item ) => (
@@ -83,7 +83,7 @@ export function SearchView() {
 						<a href={ dayHref( item.date ) } data-nav class="result">
 							<span class="card-date">
 								<MoodDot mood={ item.mood } />
-								{ yearLabel( item.date, today.value ) || `${ item.date.slice( 0, 4 ) }年` }
+								{ yearOnly( item.date ) } 
 								{ dayLabel( item.date ) }
 							</span>
 							<span class="result-text">
@@ -95,7 +95,7 @@ export function SearchView() {
 			</ol>
 			{ cursor && state === 'done' && (
 				<button type="button" class="more" onClick={ () => run( query.trim(), cursor ) }>
-					もっと見る
+					{ t( 'common.more' ) }
 				</button>
 			) }
 		</div>
