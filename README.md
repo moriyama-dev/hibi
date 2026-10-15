@@ -70,6 +70,8 @@ npx playwright install chromium
 npx playwright test              # E2E（PC とスマホの画面サイズ）
 ```
 
+接続先は環境変数 `HIBI_BASE_URL` で指定します（初期値は `http://localhost`）。例：`HIBI_BASE_URL=http://192.168.0.10 npx playwright test`
+
 E2E は、テーマ `hibi` が有効な開発用サイトに対して、専用のユーザー `hibi-e2e` で動き、終わったらそのユーザーごと消します。開発用サイトが http でも Service Worker を試せるよう、Chromium に安全な接続として扱う設定を渡しています。
 
 ### WP-CLI
