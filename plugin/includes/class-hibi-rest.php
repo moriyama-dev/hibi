@@ -418,7 +418,10 @@ class Hibi_Rest {
 				'root'      => esc_url_raw( rest_url( self::NAMESPACE_V1 . '/' ) ),
 				'nonce_url' => esc_url_raw( add_query_arg( 'action', 'hibi_nonce', admin_url( 'admin-ajax.php' ) ) ),
 				'login_url' => esc_url_raw( wp_login_url() ),
-				'home_path' => (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ),
+				// Where the app lives: "/" with the Hibi theme, "/journal/" otherwise.
+				'home_path' => Hibi_App::base_path(),
+				'sw_url'    => (string) wp_parse_url( home_url( '/hibi-sw.js' ), PHP_URL_PATH ),
+				'photo_url' => (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ),
 			),
 			'push'     => array(
 				'public_key' => Hibi_Push::public_key(),

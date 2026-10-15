@@ -12,9 +12,11 @@ A private daily journal for WordPress: one page per day, autosave, offline writi
 
 == Description ==
 
-Hibi Journal turns a WordPress site into a private journal. It stores one entry per day for each user and offers a REST API that a writing app talks to. The companion theme "Hibi" is that app: it opens straight into today's entry, ready to type.
+Hibi Journal adds a private journal to any WordPress site. Open yoursite.com/journal/ and today's page is ready to type: no editor screens, no publish button. It works with any theme, can be added to a phone's home screen, and keeps working offline.
 
-**What the plugin does**
+Optionally, the free companion theme "Hibi" makes the journal the front page of the site.
+
+**What it does**
 
 * One entry per day and per user, always private. Other users never see another person's journal.
 * The day starts at 4:00 by default, so writing after midnight still belongs to the day you lived.
@@ -26,7 +28,13 @@ Hibi Journal turns a WordPress site into a private journal. It stores one entry 
 * Search across all entries, a calendar, a timeline and "on this day".
 * A daily reminder notification (Web Push), only on days you have not written yet.
 * Export everything as a ZIP (JSON, Markdown per day, photos) and import it again.
+* Installable as an app (PWA), with offline writing that is sent when the connection is back.
+* Japanese input friendly: autosave never interrupts an IME composition.
 * WP-CLI: `wp hibi export`, `wp hibi import`, `wp hibi send-reminders`.
+
+**Source code**
+
+The app's JavaScript in `assets/app/` is built from the TypeScript source included in the `app/` folder of this plugin (Preact and Vite). The PHP libraries in `vendor-prefixed/` are minishlink/web-push and its dependencies, moved under the `Hibi\Vendor` namespace with Strauss so they cannot clash with other plugins.
 
 **Privacy**
 
@@ -46,8 +54,9 @@ Reminder notifications are delivered through the push service of the user's brow
 == Installation ==
 
 1. Install and activate the plugin.
-2. Install and activate the "Hibi" theme, which provides the writing app.
-3. For reminders, add a server cron job that runs every five minutes:
+2. Open yoursite.com/journal/ and start writing. Logged-out visitors are sent to the login form first.
+3. Optional: activate the "Hibi" theme to make the journal the front page.
+4. For reminders, add a server cron job that runs every five minutes:
    `*/5 * * * * wp --path=/path/to/wordpress hibi send-reminders --quiet`
    WP-Cron runs the same job as a backup.
 
@@ -63,9 +72,21 @@ No. Entries are private posts in the WordPress database. Use HTTPS, keep backups
 
 Nothing is deleted. Entries stay in the database as private posts, and photos stay in the uploads folder.
 
+= Can I change the address /journal/? =
+
+Yes, with the `hibi_app_slug` filter, for example `add_filter( 'hibi_app_slug', fn() => 'diary' );`.
+
+= Can other people on the site see my journal? =
+
+No. Each user has their own journal, and entries are private posts that only their author can read through the app.
+
 = Can I move my journal to another site? =
 
 Yes. Download the ZIP from the settings screen (or run `wp hibi export`) and import it on the other site.
+
+== Credits ==
+
+The app bundles Preact (MIT, https://github.com/preactjs/preact), @preact/signals (MIT, https://github.com/preactjs/signals), marked (MIT, https://github.com/markedjs/marked) and DOMPurify (Apache-2.0 or MPL-2.0, https://github.com/cure53/DOMPurify). The icons were made for this plugin and are released under the GPL v2 or later.
 
 == Changelog ==
 

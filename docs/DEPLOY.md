@@ -6,7 +6,7 @@
 
 | 項目 | 状態 |
 |---|---|
-| 置き場所 | 未定。日記専用の新しいサイトにするか、既存のサイトに入れるか |
+| 置き場所 | 既存のサイトに入れる（2026-10-15 決定）。プラグインが wp.org で公開されたあとに行う |
 | ドメイン | 未定 |
 | SSH の接続先（Host / User / 鍵） | 未定 |
 | 本番の WordPress のパス | 未定 |
@@ -28,8 +28,6 @@ ssh "$PROD_SSH" 'which wp rsync php mysql; php -v | head -1'
 ssh "$PROD_SSH" 'php -m' | grep -iE '^(openssl|gmp|bcmath|imagick|zip|mbstring|exif)$'
 ssh "$PROD_SSH" "wp --path='$PROD_WP' core version; wp --path='$PROD_WP' option get timezone_string; wp --path='$PROD_WP' option get permalink_structure"
 ssh "$PROD_SSH" "wp --path='$PROD_WP' plugin list --fields=name,status,version; wp --path='$PROD_WP' theme list --fields=name,status,version"
-# 戻すときのために、今のテーマ名を控えておく
-PROD_PREV_THEME=$(ssh "$PROD_SSH" "wp --path='$PROD_WP' theme list --status=active --field=name"); echo "$PROD_PREV_THEME"
 ```
 
 確認すること：
@@ -40,10 +38,12 @@ PROD_PREV_THEME=$(ssh "$PROD_SSH" "wp --path='$PROD_WP' theme list --status=acti
 - `zip`（書き出し・取り込みに必要）
 - タイムゾーンが `America/Toronto`、パーマリンクが「基本」以外（`/%postname%/` など）
 - Takumi Private Gate が有効（サイト全体のログイン必須は Gate に任せている）
-- Takumi PWA が**無効**（Hibi と Service Worker がぶつかる）
+- Takumi PWA は有効のままでよい。Hibi の Service Worker の範囲は `/journal/` だけで、その下ではブラウザが範囲の狭い Hibi のほうを使う。アプリのページはテーマの `wp_head` を通らないので、Takumi PWA の manifest も入り込まない（テーマ `hibi` でサイト全体を日記にする場合は、範囲が重なるので Takumi PWA を無効にする）
 - サイトが HTTPS で開ける（Service Worker と通知に必須）
 
-稼働中のサイトに入れる場合は、ここで止まって、テーマを Hibi に切り替えてよいかを決めます（切り替えると、サイトの表側は日記アプリになります）。
+既存のサイトなので、**テーマは切り替えません。** プラグインだけを入れると、日記アプリは `$PROD_URL/journal/` に開き、サイトの表側は今のテーマのまま変わりません。テーマ `hibi` は、サイト全体を日記にしたい場合にだけ使います。
+
+wp.org で公開されたあとは、管理画面の「プラグイン → 新規追加」から `Hibi Journal` を検索して入れるのが基本です。下の 3. の zip での手順は、公開前に試す場合や、公開版より新しい版を入れる場合のものです。
 
 ## 2. バックアップ（本番）
 
@@ -71,14 +71,14 @@ cd ~/projects/hibi && bin/build.sh
 ```bash
 cd ~/projects/hibi && rm -rf /tmp/hibi-deploy && mkdir /tmp/hibi-deploy && unzip -q dist-zip/hibi-journal-0.1.0.zip -d /tmp/hibi-deploy && unzip -q dist-zip/hibi-0.1.0.zip -d /tmp/hibi-deploy
 rsync -avz --dry-run /tmp/hibi-deploy/hibi-journal/ "$PROD_SSH:$PROD_WP/wp-content/plugins/hibi-journal/"
-rsync -avz --dry-run /tmp/hibi-deploy/hibi/ "$PROD_SSH:$PROD_WP/wp-content/themes/hibi/"
 ```
+
+テーマ `hibi` は、既存のサイトには送りません。
 
 ## 4. 有効化と初期設定（本番）
 
 ```bash
 ssh "$PROD_SSH" "wp --path='$PROD_WP' plugin activate hibi-journal"
-ssh "$PROD_SSH" "wp --path='$PROD_WP' theme activate hibi"
 ssh "$PROD_SSH" "wp --path='$PROD_WP' rewrite flush"
 ```
 
@@ -104,9 +104,11 @@ VM のシェルから行う確認：
 curl -s -o /dev/null -w '%{http_code}\n' "$PROD_URL/wp-content/uploads/hibi-private/index.php"
 # Service Worker と manifest は返る（200）
 curl -s -o /dev/null -w '%{http_code}\n' "$PROD_URL/hibi-sw.js"
-curl -s -o /dev/null -w '%{http_code}\n' "$PROD_URL/manifest.webmanifest"
+curl -s -o /dev/null -w '%{http_code}\n' "$PROD_URL/hibi-manifest.webmanifest"
 # アプリ本体は未ログインならログイン画面へ（302）
-curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' "$PROD_URL/"
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' "$PROD_URL/journal/"
+# サイトのトップページは今のテーマのまま（200）
+curl -s -o /dev/null -w '%{http_code}\n' "$PROD_URL/"
 # cron が動いた記録
 ssh "$PROD_SSH" "wp --path='$PROD_WP' cron event list --fields=hook,next_run_relative | grep hibi"
 ```
@@ -124,8 +126,9 @@ ssh "$PROD_SSH" "wp --path='$PROD_WP' cron event list --fields=hook,next_run_rel
 ## 7. 元に戻す
 
 ```bash
-ssh "$PROD_SSH" "wp --path='$PROD_WP' theme activate '$PROD_PREV_THEME'"
 ssh "$PROD_SSH" "wp --path='$PROD_WP' plugin deactivate hibi-journal"
 ```
+
+テーマは切り替えていないので、戻すのはプラグインだけです。
 
 プラグインを無効にしても、日記と写真は残ります。それでも戻らない場合は、2. のバックアップから DB とファイルを戻します（戻す前に、その時点の状態をもう一度バックアップします）。

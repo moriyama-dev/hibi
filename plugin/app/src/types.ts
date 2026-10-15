@@ -96,6 +96,8 @@ export interface Bootstrap {
 		nonce_url: string;
 		login_url: string;
 		home_path: string;
+		sw_url: string;
+		photo_url: string;
 	};
 	push: { public_key: string };
 	locale: string;

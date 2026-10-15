@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Hibi Journal
  * Plugin URI:        https://github.com/moriyama-dev/hibi
- * Description:       Turns WordPress into a private, distraction-free daily journal.
+ * Description:       A private daily journal: open the app at /journal/ and start writing. One page per day, autosave, offline writing, photos, search and a daily reminder.
  * Version:           0.1.0
  * Requires at least: 6.6
  * Requires PHP:      8.1
@@ -35,6 +35,8 @@ require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-weather.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-push.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-export.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-rest.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-strings.php';
+require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-app.php';
 require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-login.php';
 
 Hibi_Entry_Type::init();
@@ -42,10 +44,23 @@ Hibi_Entries::init();
 Hibi_Photos::init();
 Hibi_Push::init();
 Hibi_Rest::init();
+Hibi_App::init();
 Hibi_Login::init();
 
-register_activation_hook( __FILE__, array( 'Hibi_Push', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'Hibi_Push', 'deactivate' ) );
+register_activation_hook( __FILE__, 'hibi_activate' );
+register_deactivation_hook( __FILE__, 'hibi_deactivate' );
+
+function hibi_activate() {
+	Hibi_Push::activate();
+	// The app's URLs are added on the next request.
+	Hibi_App::flush_rewrites();
+}
+
+function hibi_deactivate() {
+	Hibi_Push::deactivate();
+	Hibi_App::flush_rewrites();
+	flush_rewrite_rules( false );
+}
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once HIBI_PLUGIN_DIR . 'includes/class-hibi-cli.php';

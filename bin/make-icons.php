@@ -8,7 +8,7 @@
  * @package Hibi
  */
 
-$hibi_out = dirname( __DIR__ ) . '/theme/assets/icons';
+$hibi_out = dirname( __DIR__ ) . '/plugin/assets/icons';
 
 /**
  * @param int  $size     Pixels.

@@ -1,6 +1,8 @@
 <?php
 /**
- * The front page is the app, whatever the site's reading settings say.
+ * The front page is the app, which the Hibi Journal plugin serves before
+ * this template is reached. Without the plugin, index.php explains what is
+ * missing.
  *
  * @package Hibi
  */

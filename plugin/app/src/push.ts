@@ -58,6 +58,6 @@ export function registerServiceWorker(): void {
 	}
 	const home = boot.api.home_path;
 	window.addEventListener( 'load', () => {
-		navigator.serviceWorker.register( `${ home }hibi-sw.js`, { scope: home } ).catch( () => undefined );
+		navigator.serviceWorker.register( boot.api.sw_url, { scope: home } ).catch( () => undefined );
 	} );
 }

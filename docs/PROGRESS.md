@@ -227,3 +227,24 @@ First load: JS 19.7 KB + CSS 3.4 KB gzip.
 - The bundled web-push library (with Guzzle) is not namespaced. Another plugin bundling a different Guzzle could clash.
 - Per-entry location (`location_enabled`) has a setting and storage but no capture in the app; the weather place covers the use so far.
 - The plugin on its own has no writing screen: the app is in the theme. A WordPress.org review may ask for the plugin to be useful without the theme.
+
+## Before submitting to WordPress.org (2026-10-15)
+
+### The plugin now works on its own
+
+- The app (screens, service worker, manifest, icons, UI text) moved from the theme into the plugin. With any theme it opens at `/journal/` (filter `hibi_app_slug`); a theme that declares `hibi-app` (the Hibi theme) gives it the front page and the root URLs instead.
+- The shell is the plugin's own page (`plugin/templates/app.php`), not a theme template: no theme stylesheet, script or admin bar reaches it. It requires a login itself (`auth_redirect()`), so it does not depend on an access-gate plugin.
+- The manifest moved to `/hibi-manifest.webmanifest`, so it cannot collide with another plugin's `/manifest.webmanifest`. The service worker stays at `/hibi-sw.js` with `Service-Worker-Allowed` set to the app's path.
+- Source: `plugin/app/src` (TypeScript), built into `plugin/assets/app`. The plugin ZIP carries both, so the minified files have their source alongside.
+- The theme is now thin: it declares `hibi-app`, and shows other pages (`singular.php`) and a not-found page (`index.php`).
+- UI text uses the plugin's text domain `hibi-journal`. The plugin ships `languages/hibi-journal.pot` only; the Japanese translation used on the VM (`~/translations/hibi-journal-ja.po`, compiled into `wp-content/languages/plugins/`) is kept out of the repository.
+
+### Bundled libraries under the plugin's namespace
+
+- `minishlink/web-push` and its dependencies (Guzzle, web-token, brick/math …) are moved under `Hibi\Vendor` with Strauss into `plugin/vendor-prefixed/` (`bin/prefix-vendor.sh`). The plugin loads only `vendor-prefixed/autoload.php`; the unprefixed class names are not defined. Composer's `plugin/vendor/` is no longer in the repository.
+
+### Checks
+
+- Plugin Check: no errors, no warnings. Theme Check: no REQUIRED, no WARNING.
+- PHPUnit: 81 pass (push delivery with the prefixed library included).
+- Playwright: 91 pass, 3 skipped by design. New: the plugin with Twenty Twenty-Five (app at `/journal/`, saves, screens below `/journal/`, the theme keeps the front page, no theme styles in the shell, service worker and manifest scoped to `/journal/`). The tests now stop at once when `HIBI_BASE_URL` does not match the site.

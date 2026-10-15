@@ -3,8 +3,7 @@ import { boot } from '../store';
 import type { Entry } from '../types';
 import { t } from '../i18n';
 
-const home = boot.api.home_path;
-const photoSrc = ( id: number ) => `${ home }?hibi_photo=${ id }&size=medium`;
+const photoSrc = ( id: number ) => `${ boot.api.photo_url }?hibi_photo=${ id }&size=medium`;
 
 let renderer: Promise<typeof import( '../markdown' )> | null = null;
 

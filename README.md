@@ -1,11 +1,9 @@
 # Hibi
 
-WordPress を「日記を書くためだけの道具」にする、プラグインとテーマのセットです。ログインすると、いきなり今日の日記が開き、そのまま書き始められます。
+WordPress に、日記を書くためだけのアプリを足すプラグインと、それをサイトのトップページにするテーマです。開くといきなり今日の日記が出て、そのまま書き始められます。
 
-- **プラグイン `hibi-journal`**：日記のデータ、REST API（`hibi/v1`）、写真、検索、通知、書き出し・取り込み
-- **テーマ `hibi`**：画面のすべて。ホーム画面に追加できるアプリ（PWA）として動き、オフラインでも書けます
-
-テーマを替えても日記は残り、プラグイン単体で書き出せます。
+- **プラグイン `hibi-journal`**：これだけで動きます。どのテーマでも `/journal/` で日記アプリが開きます。データ、REST API（`hibi/v1`）、アプリの画面（PWA）、写真、検索、通知、書き出し・取り込み
+- **テーマ `hibi`**（任意）：アプリをサイトのトップページにし、画面を `/calendar/` のようにサイト直下に置きます
 
 ![今日の画面](theme/screenshot.png)
 
@@ -38,9 +36,11 @@ WordPress を「日記を書くためだけの道具」にする、プラグイ�
 ## リポジトリの構成
 
 ```
-plugin/          プラグイン hibi-journal（vendor/ に web-push を同梱）
-theme/           テーマ hibi（assets/dist にビルド済みのアプリ）
-app/src/         アプリのソース（TypeScript + Preact + Vite）
+plugin/          プラグイン hibi-journal
+  app/src/       アプリのソース（TypeScript + Preact + Vite）
+  assets/app/    ビルド済みのアプリ
+  vendor-prefixed/  web-push とその依存（名前空間を Hibi\Vendor に付け替え済み）
+theme/           テーマ hibi（トップページをアプリにするだけの薄いテーマ）
 tests/php/       PHPUnit
 tests/e2e/       Playwright
 bin/             開発用スクリプト
@@ -52,9 +52,9 @@ docs/            進捗の記録、本番への反映手順
 ```bash
 npm install
 composer install                 # リポジトリ直下：PHPUnit
-(cd plugin && composer install)  # プラグイン：web-push
+bin/prefix-vendor.sh             # プラグインの web-push を入れて名前空間を付け替える
 
-npm run build                    # app/src → theme/assets/dist
+npm run build                    # plugin/app/src → plugin/assets/app
 npm run dev                      # 変更を監視してビルド
 ```
 

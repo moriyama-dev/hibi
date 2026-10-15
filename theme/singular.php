@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 <body <?php body_class( 'hibi-content' ); ?>>
 <?php wp_body_open(); ?>
 <main class="hibi-page">
-	<p><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Back to the journal', 'hibi' ); ?></a></p>
+	<p><a href="<?php echo esc_url( class_exists( 'Hibi_App' ) ? Hibi_App::url() : home_url( '/' ) ); ?>"><?php esc_html_e( 'Back to the journal', 'hibi' ); ?></a></p>
 	<?php
 	while ( have_posts() ) :
 		the_post();

@@ -3,13 +3,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hibi Journal 0.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/plugin\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/hibi-journal\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-15T02:00:37+00:00\n"
+"POT-Creation-Date: 2026-10-15T11:15:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: hibi-journal\n"
@@ -27,7 +27,7 @@ msgstr ""
 
 #. Description of the plugin
 #: hibi-journal.php
-msgid "Turns WordPress into a private, distraction-free daily journal."
+msgid "A private daily journal: open the app at /journal/ and start writing. One page per day, autosave, offline writing, photos, search and a daily reminder."
 msgstr ""
 
 #. Author of the plugin
@@ -40,12 +40,25 @@ msgstr ""
 msgid "https://takumi.ca"
 msgstr ""
 
-#: includes/class-hibi-entries.php:100
-#: includes/class-hibi-entries.php:126
+#: includes/class-hibi-app.php:151
+#: includes/class-hibi-rest.php:369
+msgid "You cannot use the journal."
+msgstr ""
+
+#: includes/class-hibi-app.php:273
+msgid "You are offline. Connect and open the app again."
+msgstr ""
+
+#: includes/class-hibi-app.php:301
+msgid "A private daily journal."
+msgstr ""
+
+#: includes/class-hibi-entries.php:99
+#: includes/class-hibi-entries.php:125
 msgid "The entry is being saved from another request. Please try again."
 msgstr ""
 
-#: includes/class-hibi-entries.php:172
+#: includes/class-hibi-entries.php:171
 msgid "This entry was updated on another device."
 msgstr ""
 
@@ -81,31 +94,31 @@ msgstr ""
 msgid "Journal Tag"
 msgstr ""
 
-#: includes/class-hibi-export.php:57
+#: includes/class-hibi-export.php:71
 msgid "Exporting needs the PHP Zip extension."
 msgstr ""
 
-#: includes/class-hibi-export.php:62
+#: includes/class-hibi-export.php:76
 msgid "The export file could not be created."
 msgstr ""
 
-#: includes/class-hibi-export.php:173
+#: includes/class-hibi-export.php:187
 msgid "The import file is missing or too large."
 msgstr ""
 
-#: includes/class-hibi-export.php:180
+#: includes/class-hibi-export.php:194
 msgid "Importing a ZIP needs the PHP Zip extension."
 msgstr ""
 
-#: includes/class-hibi-export.php:184
+#: includes/class-hibi-export.php:198
 msgid "The ZIP file could not be opened."
 msgstr ""
 
-#: includes/class-hibi-export.php:196
+#: includes/class-hibi-export.php:210
 msgid "This is not a Hibi export file."
 msgstr ""
 
-#: includes/class-hibi-export.php:202
+#: includes/class-hibi-export.php:216
 msgid "This file comes from a newer version of Hibi Journal. Please update the plugin first."
 msgstr ""
 
@@ -139,36 +152,36 @@ msgstr ""
 msgid "The photo could not be read."
 msgstr ""
 
-#: includes/class-hibi-photos.php:478
+#: includes/class-hibi-photos.php:477
 msgid "Photo not found."
 msgstr ""
 
-#: includes/class-hibi-push.php:53
+#: includes/class-hibi-push.php:55
 msgid "Every five minutes (Hibi Journal)"
 msgstr ""
 
-#: includes/class-hibi-push.php:83
+#: includes/class-hibi-push.php:85
 msgid "Notifications need the OpenSSL PHP extension."
 msgstr ""
 
-#: includes/class-hibi-push.php:86
+#: includes/class-hibi-push.php:88
 msgid "Notifications need the GMP or BCMath PHP extension."
 msgstr ""
 
-#: includes/class-hibi-push.php:89
+#: includes/class-hibi-push.php:91
 msgid "The notification library is missing."
 msgstr ""
 
-#: includes/class-hibi-push.php:148
+#: includes/class-hibi-push.php:150
 msgid "The notification subscription is invalid."
 msgstr ""
 
-#: includes/class-hibi-push.php:329
-#: includes/class-hibi-rest.php:669
+#: includes/class-hibi-push.php:331
+#: includes/class-hibi-rest.php:672
 msgid "Hibi"
 msgstr ""
 
-#: includes/class-hibi-push.php:329
+#: includes/class-hibi-push.php:331
 msgid "Would you like to write a little about today?"
 msgstr ""
 
@@ -176,25 +189,807 @@ msgstr ""
 msgid "Please log in."
 msgstr ""
 
-#: includes/class-hibi-rest.php:369
-msgid "You cannot use the journal."
-msgstr ""
-
-#: includes/class-hibi-rest.php:450
-#: includes/class-hibi-rest.php:550
+#: includes/class-hibi-rest.php:453
+#: includes/class-hibi-rest.php:553
 msgid "You cannot write an entry for a future date."
 msgstr ""
 
-#: includes/class-hibi-rest.php:546
+#: includes/class-hibi-rest.php:549
 msgid "No photo was sent."
 msgstr ""
 
-#: includes/class-hibi-rest.php:656
+#: includes/class-hibi-rest.php:659
 msgid "No file was sent."
 msgstr ""
 
-#: includes/class-hibi-rest.php:669
+#: includes/class-hibi-rest.php:672
 msgid "Notifications are working."
+msgstr ""
+
+#: includes/class-hibi-strings.php:21
+msgid "Main"
+msgstr ""
+
+#: includes/class-hibi-strings.php:22
+msgid "Today"
+msgstr ""
+
+#: includes/class-hibi-strings.php:23
+msgid "Look back"
+msgstr ""
+
+#: includes/class-hibi-strings.php:24
+#: includes/class-hibi-strings.php:150
+msgid "Search"
+msgstr ""
+
+#: includes/class-hibi-strings.php:25
+#: includes/class-hibi-strings.php:158
+msgid "Settings"
+msgstr ""
+
+#: includes/class-hibi-strings.php:26
+msgid "Calendar"
+msgstr ""
+
+#: includes/class-hibi-strings.php:27
+#: includes/class-hibi-strings.php:141
+msgid "Timeline"
+msgstr ""
+
+#: includes/class-hibi-strings.php:28
+msgid "On this day"
+msgstr ""
+
+#: includes/class-hibi-strings.php:29
+msgid "Page not found"
+msgstr ""
+
+#: includes/class-hibi-strings.php:30
+msgid "Back to today's entry"
+msgstr ""
+
+#: includes/class-hibi-strings.php:33
+msgid "Loading…"
+msgstr ""
+
+#: includes/class-hibi-strings.php:34
+msgid "Could not load."
+msgstr ""
+
+#: includes/class-hibi-strings.php:35
+msgid "Close"
+msgstr ""
+
+#: includes/class-hibi-strings.php:36
+msgid "Show more"
+msgstr ""
+
+#: includes/class-hibi-strings.php:37
+msgid "Searching…"
+msgstr ""
+
+#: includes/class-hibi-strings.php:38
+msgid "Nothing found."
+msgstr ""
+
+#: includes/class-hibi-strings.php:39
+msgid "Search failed."
+msgstr ""
+
+#: includes/class-hibi-strings.php:40
+msgid "Sending…"
+msgstr ""
+
+#: includes/class-hibi-strings.php:43
+msgid "Saved"
+msgstr ""
+
+#: includes/class-hibi-strings.php:44
+msgid "Waiting to save"
+msgstr ""
+
+#: includes/class-hibi-strings.php:45
+msgid "Saving…"
+msgstr ""
+
+#: includes/class-hibi-strings.php:46
+msgid "Offline (will retry)"
+msgstr ""
+
+#: includes/class-hibi-strings.php:47
+msgid "Not saved (will retry)"
+msgstr ""
+
+#: includes/class-hibi-strings.php:48
+msgid "Changed on another device"
+msgstr ""
+
+#: includes/class-hibi-strings.php:51
+msgid "Today's mood"
+msgstr ""
+
+#: includes/class-hibi-strings.php:52
+msgid "Awful"
+msgstr ""
+
+#: includes/class-hibi-strings.php:53
+msgid "Bad"
+msgstr ""
+
+#: includes/class-hibi-strings.php:54
+msgid "Okay"
+msgstr ""
+
+#: includes/class-hibi-strings.php:55
+msgid "Good"
+msgstr ""
+
+#: includes/class-hibi-strings.php:56
+msgid "Great"
+msgstr ""
+
+#. translators: %s: mood name, e.g. "Good".
+#: includes/class-hibi-strings.php:58
+#, php-format
+msgid "Mood: %s"
+msgstr ""
+
+#: includes/class-hibi-strings.php:61
+msgid "Previous day"
+msgstr ""
+
+#: includes/class-hibi-strings.php:62
+msgid "Next day"
+msgstr ""
+
+#: includes/class-hibi-strings.php:63
+msgid "Go to today"
+msgstr ""
+
+#. translators: %d: number of days in a row with an entry.
+#: includes/class-hibi-strings.php:65
+#, php-format
+msgid "%d-day streak"
+msgstr ""
+
+#: includes/class-hibi-strings.php:66
+msgid "Entry"
+msgstr ""
+
+#: includes/class-hibi-strings.php:67
+msgid "How was your day?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:68
+#: includes/class-hibi-strings.php:70
+msgid "Write about this day"
+msgstr ""
+
+#: includes/class-hibi-strings.php:69
+msgid "Edit"
+msgstr ""
+
+#: includes/class-hibi-strings.php:71
+msgid "This day's entry could not be loaded. You may be offline."
+msgstr ""
+
+#: includes/class-hibi-strings.php:72
+msgid "Write anyway (sent when you are back online)"
+msgstr ""
+
+#: includes/class-hibi-strings.php:73
+msgid "Nothing was written on this day."
+msgstr ""
+
+#: includes/class-hibi-strings.php:74
+msgid "Writing tools"
+msgstr ""
+
+#: includes/class-hibi-strings.php:75
+#: includes/class-hibi-strings.php:164
+msgid "Time"
+msgstr ""
+
+#: includes/class-hibi-strings.php:76
+#: includes/class-hibi-strings.php:108
+msgid "Tags"
+msgstr ""
+
+#. translators: %s: number of characters, already formatted.
+#: includes/class-hibi-strings.php:78
+#, php-format
+msgid "%s chars"
+msgstr ""
+
+#. translators: %s: number of characters, already formatted.
+#: includes/class-hibi-strings.php:80
+#, php-format
+msgid "%s characters"
+msgstr ""
+
+#: includes/class-hibi-strings.php:81
+msgid "Tap to use this question"
+msgstr ""
+
+#: includes/class-hibi-strings.php:84
+msgid "This entry was changed on another device."
+msgstr ""
+
+#: includes/class-hibi-strings.php:85
+msgid "Choose which version to keep. Saving is paused until you choose, and neither version is lost."
+msgstr ""
+
+#: includes/class-hibi-strings.php:86
+msgid "Keep this device's version"
+msgstr ""
+
+#: includes/class-hibi-strings.php:87
+msgid "Keep the other version"
+msgstr ""
+
+#: includes/class-hibi-strings.php:88
+msgid "Keep both, joined"
+msgstr ""
+
+#: includes/class-hibi-strings.php:91
+msgid "Days changed on another device:"
+msgstr ""
+
+#. translators: %d: number of days with unsent changes.
+#: includes/class-hibi-strings.php:93
+#, php-format
+msgid "%d day(s) waiting to be sent. They will be sent when you are back online."
+msgstr ""
+
+#: includes/class-hibi-strings.php:96
+#: includes/class-hibi-strings.php:100
+msgid "Photo"
+msgstr ""
+
+#. translators: %d: number of photos.
+#: includes/class-hibi-strings.php:98
+#, php-format
+msgid "Photos: %d"
+msgstr ""
+
+#: includes/class-hibi-strings.php:99
+msgid "Enlarge photo"
+msgstr ""
+
+#: includes/class-hibi-strings.php:101
+msgid "Original size"
+msgstr ""
+
+#: includes/class-hibi-strings.php:102
+msgid "Delete"
+msgstr ""
+
+#: includes/class-hibi-strings.php:103
+msgid "Delete this photo? This cannot be undone."
+msgstr ""
+
+#: includes/class-hibi-strings.php:104
+msgid "The photo could not be deleted. Check your connection."
+msgstr ""
+
+#: includes/class-hibi-strings.php:105
+msgid "The photo could not be added."
+msgstr ""
+
+#. translators: %s: tag name.
+#: includes/class-hibi-strings.php:110
+#, php-format
+msgid "Remove %s"
+msgstr ""
+
+#: includes/class-hibi-strings.php:111
+msgid "Add a tag"
+msgstr ""
+
+#: includes/class-hibi-strings.php:114
+msgid "Previous month"
+msgstr ""
+
+#: includes/class-hibi-strings.php:115
+msgid "Next month"
+msgstr ""
+
+#. translators: %s: date, e.g. "October 14".
+#: includes/class-hibi-strings.php:117
+#, php-format
+msgid "%s, written"
+msgstr ""
+
+#. translators: 1: date, e.g. "October 14", 2: mood name.
+#: includes/class-hibi-strings.php:119
+#, php-format
+msgid "%1$s, written, mood: %2$s"
+msgstr ""
+
+#: includes/class-hibi-strings.php:120
+msgid "Days written"
+msgstr ""
+
+#: includes/class-hibi-strings.php:121
+msgid "Characters"
+msgstr ""
+
+#: includes/class-hibi-strings.php:122
+msgid "Longest streak"
+msgstr ""
+
+#. translators: %s: year, already formatted.
+#: includes/class-hibi-strings.php:124
+#, php-format
+msgid "Entries in %s"
+msgstr ""
+
+#. translators: %d: number of days.
+#: includes/class-hibi-strings.php:126
+#, php-format
+msgid "%d days"
+msgstr ""
+
+#: includes/class-hibi-strings.php:129
+msgid "A year ago today"
+msgstr ""
+
+#. translators: %d: number of years.
+#: includes/class-hibi-strings.php:131
+#, php-format
+msgid "%d years ago today"
+msgstr ""
+
+#. translators: %s: month and day, e.g. "October 14".
+#: includes/class-hibi-strings.php:133
+#, php-format
+msgid "Entries on %s"
+msgstr ""
+
+#: includes/class-hibi-strings.php:134
+msgid "No entries on this day in past years yet."
+msgstr ""
+
+#. translators: %s: year, already formatted.
+#: includes/class-hibi-strings.php:136
+#, php-format
+msgid "A year ago (%s)"
+msgstr ""
+
+#. translators: 1: number of years, 2: year, already formatted.
+#: includes/class-hibi-strings.php:138
+#, php-format
+msgid "%1$d years ago (%2$s)"
+msgstr ""
+
+#: includes/class-hibi-strings.php:142
+msgid "Filter by tag"
+msgstr ""
+
+#: includes/class-hibi-strings.php:143
+msgid "All tags"
+msgstr ""
+
+#: includes/class-hibi-strings.php:144
+msgid "Filter by mood"
+msgstr ""
+
+#: includes/class-hibi-strings.php:145
+msgid "All moods"
+msgstr ""
+
+#: includes/class-hibi-strings.php:146
+msgid "With photos"
+msgstr ""
+
+#: includes/class-hibi-strings.php:147
+msgid "No matching entries."
+msgstr ""
+
+#: includes/class-hibi-strings.php:151
+msgid "Search your journal"
+msgstr ""
+
+#. translators: %d: number of results.
+#: includes/class-hibi-strings.php:153
+#, php-format
+msgid "%d result(s)"
+msgstr ""
+
+#. translators: %d: number of results shown so far.
+#: includes/class-hibi-strings.php:155
+#, php-format
+msgid "%d+ results"
+msgstr ""
+
+#: includes/class-hibi-strings.php:159
+msgid "Start of the day"
+msgstr ""
+
+#: includes/class-hibi-strings.php:160
+msgid "Entries written before this time belong to the previous day."
+msgstr ""
+
+#: includes/class-hibi-strings.php:161
+msgid "Reminder"
+msgstr ""
+
+#: includes/class-hibi-strings.php:162
+msgid "One notification, only on days you have not written by this time."
+msgstr ""
+
+#: includes/class-hibi-strings.php:163
+msgid "Send reminders"
+msgstr ""
+
+#: includes/class-hibi-strings.php:165
+msgid "Send a test notification"
+msgstr ""
+
+#: includes/class-hibi-strings.php:166
+msgid "Stop notifications on this device"
+msgstr ""
+
+#: includes/class-hibi-strings.php:167
+msgid "On iPhone, notifications arrive only in the app added to the Home Screen from Safari (iOS 16.4 or later)."
+msgstr ""
+
+#: includes/class-hibi-strings.php:168
+msgid "Notifications could not be set up."
+msgstr ""
+
+#: includes/class-hibi-strings.php:169
+msgid "A test notification was sent."
+msgstr ""
+
+#: includes/class-hibi-strings.php:170
+msgid "There is no device to send to."
+msgstr ""
+
+#: includes/class-hibi-strings.php:171
+msgid "The test notification could not be sent."
+msgstr ""
+
+#: includes/class-hibi-strings.php:172
+msgid "This browser does not support notifications."
+msgstr ""
+
+#: includes/class-hibi-strings.php:173
+msgid "Notifications work only when the site is opened over https."
+msgstr ""
+
+#: includes/class-hibi-strings.php:174
+msgid "Notifications are blocked. Allow them in the browser’s site settings."
+msgstr ""
+
+#: includes/class-hibi-strings.php:175
+msgid "This device does not receive notifications."
+msgstr ""
+
+#: includes/class-hibi-strings.php:176
+msgid "This device receives notifications."
+msgstr ""
+
+#: includes/class-hibi-strings.php:177
+msgid "Weather"
+msgstr ""
+
+#: includes/class-hibi-strings.php:178
+msgid "Record the day's weather automatically"
+msgstr ""
+
+#. translators: %s: place name.
+#: includes/class-hibi-strings.php:180
+#, php-format
+msgid "Place: %s"
+msgstr ""
+
+#: includes/class-hibi-strings.php:181
+msgid "not set"
+msgstr ""
+
+#: includes/class-hibi-strings.php:182
+msgid "City"
+msgstr ""
+
+#: includes/class-hibi-strings.php:183
+msgid "City name (e.g. Toronto)"
+msgstr ""
+
+#: includes/class-hibi-strings.php:184
+msgid "Find"
+msgstr ""
+
+#: includes/class-hibi-strings.php:185
+msgid "Current location"
+msgstr ""
+
+#: includes/class-hibi-strings.php:186
+msgid "This device cannot share its location."
+msgstr ""
+
+#: includes/class-hibi-strings.php:187
+msgid "Getting your location…"
+msgstr ""
+
+#: includes/class-hibi-strings.php:188
+msgid "Your location could not be found. Search by city name instead."
+msgstr ""
+
+#: includes/class-hibi-strings.php:189
+msgid "Weather comes from Open-Meteo (open-meteo.com), fetched through this server."
+msgstr ""
+
+#: includes/class-hibi-strings.php:190
+msgid "Display"
+msgstr ""
+
+#: includes/class-hibi-strings.php:191
+msgid "Text size"
+msgstr ""
+
+#: includes/class-hibi-strings.php:192
+msgid "Small"
+msgstr ""
+
+#: includes/class-hibi-strings.php:193
+msgid "Medium"
+msgstr ""
+
+#: includes/class-hibi-strings.php:194
+msgid "Large"
+msgstr ""
+
+#: includes/class-hibi-strings.php:195
+msgid "Typeface for reading"
+msgstr ""
+
+#: includes/class-hibi-strings.php:196
+msgid "Sans-serif"
+msgstr ""
+
+#: includes/class-hibi-strings.php:197
+msgid "Serif"
+msgstr ""
+
+#: includes/class-hibi-strings.php:198
+msgid "Colours"
+msgstr ""
+
+#: includes/class-hibi-strings.php:199
+msgid "Match the device"
+msgstr ""
+
+#: includes/class-hibi-strings.php:200
+msgid "Light"
+msgstr ""
+
+#: includes/class-hibi-strings.php:201
+msgid "Dark"
+msgstr ""
+
+#: includes/class-hibi-strings.php:202
+msgid "Show a question on empty days"
+msgstr ""
+
+#: includes/class-hibi-strings.php:203
+msgid "Add to the Home Screen"
+msgstr ""
+
+#: includes/class-hibi-strings.php:204
+msgid "iPhone and iPad: open this site in Safari, tap the Share button, then “Add to Home Screen”."
+msgstr ""
+
+#: includes/class-hibi-strings.php:205
+msgid "Android: open the browser menu and choose “Install app” or “Add to Home screen”."
+msgstr ""
+
+#: includes/class-hibi-strings.php:206
+msgid "Install the app"
+msgstr ""
+
+#: includes/class-hibi-strings.php:207
+msgid "Your data"
+msgstr ""
+
+#: includes/class-hibi-strings.php:208
+msgid "Download everything (ZIP)"
+msgstr ""
+
+#: includes/class-hibi-strings.php:209
+msgid "Every entry as Markdown and JSON, with photos. Keep a copy somewhere safe."
+msgstr ""
+
+#: includes/class-hibi-strings.php:210
+msgid "Import a Hibi ZIP or JSON file"
+msgstr ""
+
+#: includes/class-hibi-strings.php:211
+msgid "Days that already have an entry are skipped."
+msgstr ""
+
+#. translators: 1: number of entries imported, 2: number skipped.
+#: includes/class-hibi-strings.php:213
+#, php-format
+msgid "Imported %1$d, skipped %2$d."
+msgstr ""
+
+#: includes/class-hibi-strings.php:214
+msgid "The file could not be imported."
+msgstr ""
+
+#: includes/class-hibi-strings.php:215
+msgid "Log out"
+msgstr ""
+
+#: includes/class-hibi-strings.php:216
+msgid "Some changes have not been sent yet. Log out anyway? They stay on this device and are sent the next time you log in here."
+msgstr ""
+
+#: includes/class-hibi-strings.php:217
+msgid "Saved."
+msgstr ""
+
+#: includes/class-hibi-strings.php:220
+#: includes/class-hibi-weather.php:144
+msgid "Clear"
+msgstr ""
+
+#: includes/class-hibi-strings.php:221
+#: includes/class-hibi-weather.php:147
+msgid "Partly cloudy"
+msgstr ""
+
+#: includes/class-hibi-strings.php:222
+#: includes/class-hibi-weather.php:150
+#: includes/class-hibi-weather.php:167
+msgid "Cloudy"
+msgstr ""
+
+#: includes/class-hibi-strings.php:223
+#: includes/class-hibi-weather.php:153
+msgid "Fog"
+msgstr ""
+
+#: includes/class-hibi-strings.php:224
+#: includes/class-hibi-weather.php:156
+msgid "Drizzle"
+msgstr ""
+
+#: includes/class-hibi-strings.php:225
+#: includes/class-hibi-weather.php:159
+msgid "Rain"
+msgstr ""
+
+#: includes/class-hibi-strings.php:226
+#: includes/class-hibi-weather.php:162
+msgid "Snow"
+msgstr ""
+
+#: includes/class-hibi-strings.php:227
+#: includes/class-hibi-weather.php:165
+msgid "Thunderstorm"
+msgstr ""
+
+#: includes/class-hibi-strings.php:238
+msgid "What made you smile today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:239
+msgid "What took most of your time today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:240
+msgid "Who did you talk to today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:241
+msgid "What did you eat today that you want to remember?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:242
+msgid "What went better than expected?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:243
+msgid "What would you do differently if you had today again?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:244
+msgid "What did you learn today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:245
+msgid "What are you looking forward to tomorrow?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:246
+msgid "What tired you out today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:247
+msgid "What is one small thing you are grateful for?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:248
+msgid "What did you notice on the way somewhere today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:249
+msgid "What did the children say or do today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:250
+msgid "What was the weather like, and how did it feel?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:251
+msgid "What did you finish today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:252
+msgid "What is on your mind right now?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:253
+msgid "What did you read, watch or listen to?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:254
+msgid "What made you laugh?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:255
+msgid "Was there a moment you felt calm today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:256
+msgid "What worried you, and how big does it feel now?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:257
+msgid "What did you do for your body today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:258
+msgid "What surprised you today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:259
+msgid "Who helped you, or whom did you help?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:260
+msgid "What do you want to remember about this week?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:261
+msgid "What did you put off, and why?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:262
+msgid "Where were you at three o’clock this afternoon?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:263
+msgid "What sound, smell or colour stood out today?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:264
+msgid "What would you tell yourself a year from now?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:265
+msgid "What was the best part of the evening?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:266
+msgid "What is something you want to try soon?"
+msgstr ""
+
+#: includes/class-hibi-strings.php:267
+msgid "Describe today in three words, then explain one."
 msgstr ""
 
 #: includes/class-hibi-weather.php:33
@@ -213,35 +1008,10 @@ msgstr ""
 msgid "The place search could not be reached."
 msgstr ""
 
-#: includes/class-hibi-weather.php:144
-msgid "Clear"
+#: templates/app.php:44
+msgid "Hibi needs JavaScript to run."
 msgstr ""
 
-#: includes/class-hibi-weather.php:147
-msgid "Partly cloudy"
-msgstr ""
-
-#: includes/class-hibi-weather.php:150
-#: includes/class-hibi-weather.php:167
-msgid "Cloudy"
-msgstr ""
-
-#: includes/class-hibi-weather.php:153
-msgid "Fog"
-msgstr ""
-
-#: includes/class-hibi-weather.php:156
-msgid "Drizzle"
-msgstr ""
-
-#: includes/class-hibi-weather.php:159
-msgid "Rain"
-msgstr ""
-
-#: includes/class-hibi-weather.php:162
-msgid "Snow"
-msgstr ""
-
-#: includes/class-hibi-weather.php:165
-msgid "Thunderstorm"
+#: templates/app.php:63
+msgid "The app files are missing. Please reinstall the Hibi Journal plugin."
 msgstr ""
