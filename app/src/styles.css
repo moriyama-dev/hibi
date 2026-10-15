@@ -778,7 +778,6 @@ a.cal-day:hover {
 
 .cal-day.is-future {
 	color: var(--muted);
-	opacity: 0.4;
 }
 
 .cal-dot {

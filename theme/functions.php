@@ -37,6 +37,7 @@ add_action( 'send_headers', 'hibi_theme_shell_header' );
 function hibi_theme_setup() {
 	load_theme_textdomain( 'hibi', HIBI_THEME_DIR . '/languages' );
 	add_theme_support( 'title-tag' );
+	add_theme_support( 'automatic-feed-links' );
 	// Tells the Hibi Journal plugin that the app owns the front end, so the
 	// plugin may change login behaviour and hide the admin bar.
 	add_theme_support( 'hibi-app' );
@@ -100,7 +101,7 @@ function hibi_theme_bcp47_locale() {
  * @return bool
  */
 function hibi_theme_is_app_request() {
-	return is_front_page() || is_home() || '' !== (string) get_query_var( 'hibi_view' );
+	return is_front_page() || is_home() || is_singular() || '' !== (string) get_query_var( 'hibi_view' );
 }
 
 /**
@@ -141,6 +142,11 @@ function hibi_theme_build() {
 }
 
 function hibi_theme_assets() {
+	if ( is_singular() && ! is_front_page() ) {
+		wp_enqueue_style( 'hibi-content', HIBI_THEME_URL . '/assets/content.css', array(), HIBI_THEME_VERSION );
+		return;
+	}
+
 	// The app needs none of the block styles; keeping the shell light keeps
 	// the first paint fast.
 	wp_dequeue_style( 'wp-block-library' );
@@ -259,8 +265,8 @@ function hibi_theme_send_service_worker() {
 	header( 'Service-Worker-Allowed: ' . hibi_theme_home_path() );
 	header( 'Cache-Control: no-cache' );
 	header( 'X-Content-Type-Options: nosniff' );
-	echo 'self.HIBI_SW = ' . wp_json_encode( $config, JSON_UNESCAPED_SLASHES ) . ";\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON in a JavaScript file.
-	readfile( $source ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Static script shipped with the theme.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- JSON and a static script shipped with the theme, sent as JavaScript.
+	echo 'self.HIBI_SW = ' . wp_json_encode( $config, JSON_UNESCAPED_SLASHES ) . ";\n" . file_get_contents( $source );
 	exit;
 }
 

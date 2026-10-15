@@ -85,7 +85,7 @@ class Hibi_Search {
 			ORDER BY d.meta_value DESC
 			LIMIT %d";
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Fixed SQL with trusted table names; values go through prepare().
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fixed SQL with trusted table names; values go through prepare().
 		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ) );
 
 		$more  = count( $rows ) > self::PAGE_SIZE;

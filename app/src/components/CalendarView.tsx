@@ -78,9 +78,9 @@ export function CalendarView() {
 
 			{ failed && <p class="day-loading">{ t( 'common.load_failed' ) }</p> }
 
-			<div class="calendar" role="grid" aria-label={ monthLabel( year, month ) } aria-busy={ ! days && ! failed }>
+			<div class="calendar" aria-busy={ ! days && ! failed }>
 				{ DOW.map( ( d, i ) => (
-					<span key={ d } class={ `cal-dow${ i === 0 ? ' is-sun' : '' }` } role="columnheader">
+					<span key={ i } class={ `cal-dow${ i === 0 ? ' is-sun' : '' }` } aria-hidden="true">
 						{ d }
 					</span>
 				) ) }
@@ -96,11 +96,11 @@ export function CalendarView() {
 					const cls = `cal-day${ date === today.value ? ' is-today' : '' }${ info ? ' has-entry' : '' }`;
 					const dot = <span class={ `cal-dot level-${ info ? Math.max( 1, info.level ) : 0 }${ info?.mood ? ` mood-bg-${ info.mood }` : '' }` } />;
 					return future ? (
-						<span key={ date } class={ `${ cls } is-future` } role="gridcell">
+						<span key={ date } class={ `${ cls } is-future` } aria-hidden="true">
 							{ i + 1 }
 						</span>
 					) : (
-						<a key={ date } href={ dayHref( date ) } data-nav class={ cls } role="gridcell" aria-label={ label }>
+						<a key={ date } href={ dayHref( date ) } data-nav class={ cls } aria-label={ label }>
 							{ i + 1 }
 							{ dot }
 						</a>

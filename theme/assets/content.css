@@ -1,0 +1,48 @@
+/* Plain reading layout for pages that are not part of the app. */
+body.hibi-content {
+	margin: 0;
+	background: #f7f6f3;
+	color: #22252b;
+	font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+	line-height: 1.8;
+}
+
+@media (prefers-color-scheme: dark) {
+	body.hibi-content {
+		background: #15171b;
+		color: #e6e7ea;
+	}
+}
+
+.hibi-page {
+	max-width: 40em;
+	margin: 0 auto;
+	padding: 24px 16px 64px;
+}
+
+.hibi-page img {
+	max-width: 100%;
+	height: auto;
+}
+
+.hibi-page a {
+	color: #35558a;
+}
+
+.alignleft { float: left; margin: 0 1em 1em 0; }
+.alignright { float: right; margin: 0 0 1em 1em; }
+.aligncenter { display: block; margin: 0 auto 1em; }
+.wp-caption { max-width: 100%; }
+.wp-caption-text,
+.gallery-caption { font-size: 0.9em; opacity: 0.8; }
+.sticky,
+.bypostauthor { outline: 0; }
+
+.screen-reader-text {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}

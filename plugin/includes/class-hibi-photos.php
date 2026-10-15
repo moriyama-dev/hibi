@@ -438,7 +438,6 @@ class Hibi_Photos {
 				'order'                  => 'ASC',
 				'meta_key'               => self::META, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Limits to Hibi photos.
 				'update_post_term_cache' => false,
-				'suppress_filters'       => true,
 			)
 		);
 		$out = array();

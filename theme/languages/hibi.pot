@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-15T01:59:40+00:00\n"
+"POT-Creation-Date: 2026-10-15T02:10:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: hibi\n"
@@ -39,11 +39,11 @@ msgstr ""
 msgid "https://takumi.ca"
 msgstr ""
 
-#: functions.php:250
+#: functions.php:256
 msgid "You are offline. Connect and open the app again."
 msgstr ""
 
-#: functions.php:272
+#: functions.php:278
 msgid "A private daily journal."
 msgstr ""
 
@@ -830,4 +830,12 @@ msgstr ""
 
 #: index.php:26
 msgid "Please activate the Hibi Journal plugin."
+msgstr ""
+
+#: singular.php:21
+msgid "Back to the journal"
+msgstr ""
+
+#: singular.php:32
+msgid "Pages:"
 msgstr ""

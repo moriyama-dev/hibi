@@ -173,3 +173,57 @@ First load: JS 19.7 KB + CSS 3.4 KB gzip.
 ### Not verified
 
 - Real push delivery to a phone, and the service worker on a phone: both need HTTPS, which the VM does not have.
+
+## Phase 5 — Finishing (2026-10-14 to 2026-10-15)
+
+### Done
+
+- Interface text: every string is written in English in `theme/inc/strings.php`, wrapped in `__( ..., 'hibi' )`, and handed to the app with the bootstrap data. The app has no UI text of its own. Dates, weekdays and numbers are formatted with `Intl` in the user's language. The app follows the language in the user's profile (`switch_to_user_locale()`), and API calls carry `_locale=user`.
+- Translations: `theme/languages/hibi.pot`, `ja.po`, `ja.mo`, `ja.l10n.php` (the theme is not on WordPress.org, so no language pack would reach it); `plugin/languages/hibi-journal.pot` only.
+- Settings: text size, reading typeface, colours, daily question on/off, add to Home Screen (install button where the browser offers one, instructions otherwise), export, import, log out (asks first if changes are unsent; clears the cached pages and entries).
+- Daily question on an empty today (30 questions, the same on every device for a given day); tapping it quotes it at the top of the entry.
+- Export: ZIP with `entries.json` (schema version 1), `markdown/YYYY/YYYY-MM-DD.md` with a YAML header, and `photos/`. Import of the same ZIP or JSON; days with an entry are skipped, so importing twice changes nothing; ZIP members are read by name only, never extracted by path. `wp hibi export` and `wp hibi import`.
+- `uninstall.php` removes keys, device subscriptions and caches, never entries or photos.
+- `readme.txt` for the plugin (including the external services section) and the theme.
+- Theme: `front-page.php` (the front page is always the app) and `singular.php` (other posts and pages in a plain reading layout instead of a 404).
+- `bin/build.sh`: checks that versions agree, builds the app, and writes `dist-zip/hibi-journal-<version>.zip` and `dist-zip/hibi-<version>.zip` with no dotfiles, tests or development files.
+- `docs/DEPLOY.md`: steps for Dreamhost (not run).
+
+### Checks
+
+| Check | Result |
+|---|---|
+| Plugin Check (`wp plugin check hibi-journal`) | No errors, no warnings |
+| Theme Check (`wp theme-check run hibi`) | No REQUIRED, no WARNING (22 RECOMMENDED items concern blog features: comments, menus, widgets) |
+| PHPUnit | 81 tests pass |
+| Playwright | 85 pass, 3 skipped by design (phone-only measurements on the desktop profile) |
+| axe-core, WCAG 2.2 AA, 7 screens × light/dark | No violations |
+| Keyboard | Every control on the day screen is reachable with Tab and shows a focus outline |
+| Touch targets (phone profile) | All at least 36 px on both sides; the main controls are 44 px |
+| PHP warnings in the Apache log | None from Hibi apart from the two fixed `wp_tempnam()` errors |
+
+### Measurements
+
+| Acceptance criterion | Result |
+|---|---|
+| Second start until the editor can be used (phone profile, 4× CPU, slow 4G) | 95–100 ms (limit 1 s). The network emulation may not slow the service worker's own fetches, and the VM is on the local network: confirm on a real phone over Dreamhost. |
+| First load, gzip: shell HTML + JS + CSS | 7.0 + 22.8 + 3.7 = 33.6 KB (limit 100 KB) |
+| Typing in a 10,000-character entry (4× CPU) | Worst input event 16 ms (target under 100 ms) |
+| Search with 3,000 days | 14–28 ms (phase 3) |
+
+### Fixed during this phase
+
+- Export failed with a fatal error over REST: `wp_tempnam()` lives in an admin include that REST requests do not load.
+- The calendar used `role="grid"` without rows, and future days had too little contrast.
+
+### Packages installed
+
+- WordPress plugin Theme Check (activated on the VM site).
+- Dev: @axe-core/playwright 4.
+
+### Not done or not verified
+
+- Real devices (Home Screen install, push delivery, keyboard toolbar on iPhone, HEIC from iPhone): needs HTTPS, to be checked on Dreamhost.
+- The bundled web-push library (with Guzzle) is not namespaced. Another plugin bundling a different Guzzle could clash.
+- Per-entry location (`location_enabled`) has a setting and storage but no capture in the app; the weather place covers the use so far.
+- The plugin on its own has no writing screen: the app is in the theme. A WordPress.org review may ask for the plugin to be useful without the theme.

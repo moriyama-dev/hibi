@@ -265,6 +265,10 @@ function Editor( { entry, draft, isToday }: EditorProps ) {
 		}
 		el.value = initial.content;
 		grow( el );
+		// Lets the speed checks measure the time until writing can start.
+		if ( ! performance.getEntriesByName( 'hibi-editor-ready' ).length ) {
+			performance.mark( 'hibi-editor-ready' );
+		}
 		if ( finePointer ) {
 			el.focus( { preventScroll: true } );
 			el.setSelectionRange( el.value.length, el.value.length );

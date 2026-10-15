@@ -45,7 +45,6 @@ class Hibi_Entries {
 				'order'                  => 'ASC',
 				'no_found_rows'          => true,
 				'update_post_term_cache' => true,
-				'suppress_filters'       => true,
 			)
 		);
 		return $query->posts ? $query->posts[0] : null;

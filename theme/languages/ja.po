@@ -833,3 +833,12 @@ msgstr "Hibi を使うには JavaScript が必要です。"
 #: index.php:26
 msgid "Please activate the Hibi Journal plugin."
 msgstr "Hibi Journal プラグインを有効にしてください。"
+
+#: singular.php:21
+msgid "Back to the journal"
+msgstr "日記に戻る"
+
+#: singular.php:32
+msgid "Pages:"
+msgstr "ページ："
+

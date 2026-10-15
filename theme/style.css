@@ -6,8 +6,14 @@ Author URI:        https://takumi.ca
 Description:       The writing app for the Hibi Journal plugin. Requires the Hibi Journal plugin.
 Version:           0.1.0
 Requires at least: 6.6
+Tested up to:      7.1
 Requires PHP:      8.1
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain:       hibi
+Domain Path:       /languages
+Tags:              one-column, translation-ready
+
+Hibi, Copyright 2026 Yoshiro Moriyama.
+Hibi is distributed under the terms of the GNU GPL v2 or later.
 */

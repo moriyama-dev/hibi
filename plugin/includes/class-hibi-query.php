@@ -106,7 +106,7 @@ class Hibi_Query {
 
 		$all_params = array_merge( array( (int) $user_id ), isset( $join_params ) ? $join_params : array(), $params );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Table names and the fixed SQL fragments above are built from trusted values; every value goes through prepare().
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names and the fixed SQL fragments above are built from trusted values; every value goes through prepare().
 		return $wpdb->get_results( $wpdb->prepare( $sql, $all_params ) );
 	}
 

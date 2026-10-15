@@ -38,7 +38,7 @@ test( 'calendar shows written days and opens them', async ( { page } ) => {
 	writeOnServer( day, 'あ'.repeat( 900 ), { mood: 4 } );
 
 	await page.goto( '/calendar/' );
-	const cell = page.getByRole( 'gridcell', { name: /1日、書いた日、気分 良い/ } );
+	const cell = page.getByRole( 'link', { name: /1日、書いた日、気分 良い/ } );
 	await expect( cell ).toBeVisible();
 	await expect( cell.locator( '.cal-dot' ) ).toHaveClass( /level-3/ );
 	await expect( page.locator( '.month-stats' ) ).toContainText( '900' );
