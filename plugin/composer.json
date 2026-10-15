@@ -10,5 +10,18 @@
             "php": "8.1"
         },
         "optimize-autoloader": true
+    },
+    "extra": {
+        "strauss": {
+            "target_directory": "vendor-prefixed",
+            "namespace_prefix": "Hibi\\Vendor\\",
+            "classmap_prefix": "Hibi_Vendor_",
+            "constant_prefix": "HIBI_VENDOR_",
+            "packages": [
+                "minishlink/web-push"
+            ],
+            "delete_vendor_packages": true,
+            "delete_vendor_files": true
+        }
     }
 }

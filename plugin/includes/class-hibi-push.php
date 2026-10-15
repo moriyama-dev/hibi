@@ -12,9 +12,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-use Minishlink\WebPush\Subscription;
-use Minishlink\WebPush\VAPID;
-use Minishlink\WebPush\WebPush;
+// Bundled under the Hibi\Vendor namespace (bin/prefix-vendor.sh), so another
+// plugin shipping its own copy of these libraries cannot clash with it.
+use Hibi\Vendor\Minishlink\WebPush\Subscription;
+use Hibi\Vendor\Minishlink\WebPush\VAPID;
+use Hibi\Vendor\Minishlink\WebPush\WebPush;
 
 class Hibi_Push {
 
@@ -67,8 +69,8 @@ class Hibi_Push {
 	 * @return bool
 	 */
 	public static function library_loaded() {
-		if ( ! class_exists( WebPush::class ) && file_exists( HIBI_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
-			require_once HIBI_PLUGIN_DIR . 'vendor/autoload.php';
+		if ( ! class_exists( WebPush::class ) && file_exists( HIBI_PLUGIN_DIR . 'vendor-prefixed/autoload.php' ) ) {
+			require_once HIBI_PLUGIN_DIR . 'vendor-prefixed/autoload.php';
 		}
 		return class_exists( WebPush::class );
 	}

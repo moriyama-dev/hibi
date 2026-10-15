@@ -29,5 +29,7 @@ coverage/
 !theme/languages/ja.po
 !theme/languages/ja.mo
 
-# Development dependencies (the plugin ships its own vendor/ later)
+# Development dependencies
 /vendor/
+# Composer's working copy; the plugin ships vendor-prefixed/ instead
+/plugin/vendor/
