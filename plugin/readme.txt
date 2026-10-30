@@ -14,7 +14,7 @@ A private daily journal for WordPress: one page per day, autosave, offline writi
 
 Hibi Journal adds a private journal to any WordPress site. Open yoursite.com/journal/ and today's page is ready to type: no editor screens, no publish button. It works with any theme, can be added to a phone's home screen, and keeps working offline.
 
-Optionally, the free companion theme "Hibi" makes the journal the front page of the site.
+A theme that declares `add_theme_support( 'hibi-app' )` gives the journal the front page of the site instead of /journal/.
 
 **What it does**
 
@@ -55,7 +55,7 @@ Reminder notifications are delivered through the push service of the user's brow
 
 1. Install and activate the plugin.
 2. Open yoursite.com/journal/ and start writing. Logged-out visitors are sent to the login form first.
-3. Optional: activate the "Hibi" theme to make the journal the front page.
+3. Optional: to make the journal the front page, use a theme that declares `add_theme_support( 'hibi-app' )`.
 4. For reminders, add a server cron job that runs every five minutes:
    `*/5 * * * * wp --path=/path/to/wordpress hibi send-reminders --quiet`
    WP-Cron runs the same job as a backup.
