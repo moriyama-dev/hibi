@@ -38,7 +38,7 @@ The app's JavaScript in `assets/app/` is built from the TypeScript source includ
 
 **Privacy**
 
-Entries are saved as private posts. Photos are kept outside the public media library. Nothing is sent to third parties except the weather lookup described below.
+Entries are saved as private posts. Photos are kept outside the public media library. Nothing is sent to third parties except the weather lookup described below. When "Add where I am" is turned on, the browser's position is saved with the day's entry on this site only; no address lookup service is used. A place can be removed from an entry at any time.
 
 == External services ==
 

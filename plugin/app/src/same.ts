@@ -22,5 +22,8 @@ export function alreadyOnServer( fields: EntryFields, server: Entry ): boolean {
 	if ( 'weather' in fields && !! fields.weather !== !! server.weather ) {
 		return false;
 	}
+	if ( 'location' in fields && !! fields.location !== !! server.location ) {
+		return false;
+	}
 	return true;
 }

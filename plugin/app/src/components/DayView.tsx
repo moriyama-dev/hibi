@@ -6,7 +6,8 @@ import { EntrySaver } from '../saver';
 import { drafts, type Draft } from '../drafts';
 import { boot, entryCache, settings, stats, today } from '../store';
 import { openDates, refreshDraftState } from '../sync';
-import type { Entry, Mood, Photo, Weather } from '../types';
+import type { Entry, EntryLocation, Mood, Photo, Weather } from '../types';
+import { canLocate, currentPosition, locationFrom, locationText, mapUrl, placeRemoved, rememberPlaceRemoved } from '../location';
 import { ConflictBanner } from './ConflictBanner';
 import { OnThisDayCard } from './OnThisDay';
 import { PhotoButton, PhotoStrip } from './Photos';
@@ -74,7 +75,12 @@ export function DayView( { date, isToday }: Props ) {
 			{ entry && editing && <Editor key={ date } entry={ entry } draft={ draft } isToday={ isToday } /> }
 			{ entry && ! editing && (
 				<div class="reading">
-					{ entry.weather && <WeatherChip weather={ entry.weather } /> }
+					{ ( entry.weather || entry.location ) && (
+						<p class="meta">
+							{ entry.weather && <WeatherChip weather={ entry.weather } /> }
+							{ entry.location && <LocationChip location={ entry.location } /> }
+						</p>
+					) }
 					{ entry.mood && <p class="read-mood">{ t( 'mood.label', t( `mood.${ entry.mood }` ) ) }</p> }
 					<ReadView entry={ entry } />
 					<PhotoStrip date={ date } photos={ entry.photos } editable={ false } onChange={ () => undefined } />
@@ -143,6 +149,22 @@ function weatherKey( code: number ): string {
 	return code >= 95 ? 'weather.thunder' : 'weather.cloudy';
 }
 
+export function LocationChip( { location, onRemove }: { location: EntryLocation; onRemove?: () => void } ) {
+	const text = locationText( location );
+	return (
+		<span class="chip location">
+			<a href={ mapUrl( location ) } target="_blank" rel="noopener noreferrer" aria-label={ t( 'day.location_map', text ) }>
+				{ text }
+			</a>
+			{ onRemove && (
+				<button type="button" class="chip-remove" onClick={ onRemove } aria-label={ t( 'day.location_remove' ) }>
+					×
+				</button>
+			) }
+		</span>
+	);
+}
+
 export function WeatherChip( { weather }: { weather: Weather } ) {
 	const temps = weather.temp_max !== null && weather.temp_min !== null ? ` ${ Math.round( weather.temp_max ) }°/${ Math.round( weather.temp_min ) }°` : '';
 	return (
@@ -202,11 +224,13 @@ function Editor( { entry, draft, isToday }: EditorProps ) {
 		mood: draft && 'mood' in draft.fields ? draft.fields.mood ?? null : entry.mood,
 		tags: draft?.fields.tags ?? entry.tags,
 		weather: draft?.fields.weather ?? entry.weather,
+		location: draft && 'location' in draft.fields ? draft.fields.location ?? null : entry.location,
 	};
 	const [ mood, setMood ] = useState<Mood | null>( initial.mood );
 	const [ chars, setChars ] = useState( countChars( initial.content ) );
 	const [ tags, setTags ] = useState<string[]>( initial.tags );
 	const [ weather, setWeather ] = useState<Weather | null>( initial.weather );
+	const [ place, setPlace ] = useState<EntryLocation | null>( initial.location );
 	const [ showTags, setShowTags ] = useState( initial.tags.length > 0 );
 	const [ photos, setPhotos ] = useState<Photo[]>( entry.photos );
 
@@ -255,6 +279,34 @@ function Editor( { entry, draft, isToday }: EditorProps ) {
 			alive = false;
 		};
 	}, [ entry.date ] );
+
+	// Today's place is added once, only when the writer turned it on. A place
+	// removed by hand is not added again on this device.
+	useEffect( () => {
+		if ( ! isToday || place || ! settings.value.location_enabled || ! canLocate() || placeRemoved( entry.date ) ) {
+			return;
+		}
+		let alive = true;
+		currentPosition()
+			.then( ( pos ) => {
+				if ( alive && settings.value.location_enabled ) {
+					const loc = locationFrom( pos.coords.latitude, pos.coords.longitude, settings.value );
+					setPlace( loc );
+					saver.change( { location: loc } );
+				}
+			} )
+			.catch( () => undefined );
+		return () => {
+			alive = false;
+		};
+	}, [ entry.date ] );
+
+	const removePlace = () => {
+		rememberPlaceRemoved( entry.date );
+		setPlace( null );
+		saver.change( { location: null } );
+		saver.flush();
+	};
 
 	// Set the text once; the textarea is uncontrolled so re-renders never
 	// touch it while an IME composition is open.
@@ -425,9 +477,10 @@ function Editor( { entry, draft, isToday }: EditorProps ) {
 		<>
 			{ saver.conflict.value && <ConflictBanner onChoose={ onResolve } /> }
 
-			{ weather && (
+			{ ( weather || place ) && (
 				<p class="meta">
-					<WeatherChip weather={ weather } />
+					{ weather && <WeatherChip weather={ weather } /> }
+					{ place && <LocationChip location={ place } onRemove={ removePlace } /> }
 				</p>
 			) }
 

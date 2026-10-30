@@ -45,6 +45,12 @@ export interface MonthDay {
 	photos: number;
 }
 
+export interface EntryLocation {
+	lat: number;
+	lng: number;
+	label: string;
+}
+
 export interface Entry {
 	date: string;
 	exists: boolean;
@@ -52,7 +58,7 @@ export interface Entry {
 	mood: Mood | null;
 	tags: string[];
 	weather: Weather | null;
-	location: { lat: number; lng: number; label: string } | null;
+	location: EntryLocation | null;
 	char_count: number;
 	photos: Photo[];
 	version: number;
@@ -111,6 +117,7 @@ export interface EntryFields {
 	mood?: Mood | null;
 	tags?: string[];
 	weather?: Weather | null;
+	location?: EntryLocation | null;
 }
 
 export interface Place {

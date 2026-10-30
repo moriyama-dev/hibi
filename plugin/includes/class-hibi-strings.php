@@ -58,6 +58,9 @@ class Hibi_Strings {
 			'mood.label'               => __( 'Mood: %s', 'hibi-journal' ),
 
 			// Day screen.
+			/* translators: %s: place name or coordinates. */
+			'day.location_map'         => __( 'Show %s on a map', 'hibi-journal' ),
+			'day.location_remove'      => __( 'Remove the place', 'hibi-journal' ),
 			'day.prev'                 => __( 'Previous day', 'hibi-journal' ),
 			'day.next'                 => __( 'Next day', 'hibi-journal' ),
 			'day.back_today'           => __( 'Go to today', 'hibi-journal' ),
@@ -187,6 +190,10 @@ class Hibi_Strings {
 			'settings.here_getting'    => __( 'Getting your location…', 'hibi-journal' ),
 			'settings.here_failed'     => __( 'Your location could not be found. Search by city name instead.', 'hibi-journal' ),
 			'settings.weather_source'  => __( 'Weather comes from Open-Meteo (open-meteo.com), fetched through this server.', 'hibi-journal' ),
+			'settings.location'        => __( 'Place', 'hibi-journal' ),
+			'settings.location_auto'   => __( "Add where I am to today's entry", 'hibi-journal' ),
+			'settings.location_hint'   => __( 'The position is saved with the entry on this site only and is never sent to another service. A place can be removed from the entry with its × button.', 'hibi-journal' ),
+			'settings.location_denied' => __( 'The position could not be read. Allow location for this site in the browser settings, then try again.', 'hibi-journal' ),
 			'settings.display'         => __( 'Display', 'hibi-journal' ),
 			'settings.font_size'       => __( 'Text size', 'hibi-journal' ),
 			'settings.size_s'          => __( 'Small', 'hibi-journal' ),

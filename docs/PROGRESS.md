@@ -248,3 +248,24 @@ First load: JS 19.7 KB + CSS 3.4 KB gzip.
 - Plugin Check: no errors, no warnings. Theme Check: no REQUIRED, no WARNING.
 - PHPUnit: 81 pass (push delivery with the prefixed library included).
 - Playwright: 91 pass, 3 skipped by design. New: the plugin with Twenty Twenty-Five (app at `/journal/`, saves, screens below `/journal/`, the theme keeps the front page, no theme styles in the shell, service worker and manifest scoped to `/journal/`). The tests now stop at once when `HIBI_BASE_URL` does not match the site.
+
+## Place for each entry (2026-10-29)
+
+### Done
+
+- Settings: "Add where I am to today's entry" (`location_enabled`). Turning it on asks for the position right away, so the browser's permission prompt appears after a tap in the settings rather than on the writing screen. If the position is refused, the setting stays off.
+- Today's page: when the setting is on, the position is read once (cached up to 30 minutes) and saved with the entry, rounded to four decimals. No address lookup service is used: the label is the weather place from the settings when the position is within 25 km of it, otherwise the coordinates are shown.
+- The place appears as a chip next to the weather, in the editor and in the reading view. It links to OpenStreetMap (opened only when followed). The × button removes it; a removed place is not added again for that day on the same device.
+- The Markdown export carries the place in the YAML header. The JSON export and import already carried it.
+- readme.txt privacy note updated.
+
+### Tests
+
+- PHPUnit: 82 pass (new: place in the Markdown header).
+- Playwright: 99 pass, 3 skipped by design (new, desktop and mobile: nothing saved while the setting is off; place named after the nearby weather place; coordinates when far away; a removed place stays removed after a reload; a refused position leaves the setting off).
+- Plugin Check: no errors.
+
+### Open items
+
+- On a phone over HTTPS: the permission prompt and the place on today's page (added to the device checks in `docs/DEPLOY.md`).
+

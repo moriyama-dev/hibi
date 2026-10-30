@@ -65,6 +65,25 @@ class Test_Hibi_Export extends WP_UnitTestCase {
 		$this->assertStringContainsString( '![](../../photos/2026-10-01-5.jpg)', $md );
 	}
 
+	public function test_markdown_header_has_the_place() {
+		$md = Hibi_Export::markdown(
+			array(
+				'date'     => '2026-10-02',
+				'content'  => '',
+				'mood'     => null,
+				'tags'     => array(),
+				'weather'  => null,
+				'location' => array(
+					'lat'   => 43.6532,
+					'lng'   => -79.3832,
+					'label' => 'Toronto, Ontario',
+				),
+				'photos'   => array(),
+			)
+		);
+		$this->assertStringStartsWith( "---\ndate: 2026-10-02\nlocation: { lat: 43.6532, lng: -79.3832, label: \"Toronto, Ontario\" }\n---", $md );
+	}
+
 	public function test_zip_paths_cannot_escape() {
 		$user = self::factory()->user->create();
 		$zip  = new ZipArchive();

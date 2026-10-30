@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { api, ApiError } from '../api';
 import { drafts } from '../drafts';
 import { t } from '../i18n';
+import { canLocate, currentPosition } from '../location';
 import { disablePush, enablePush, pushStatus, type PushStatus } from '../push';
 import { boot, settings } from '../store';
 import type { Place, Settings } from '../types';
@@ -18,6 +19,7 @@ export function SettingsView() {
 			<ReminderSection />
 			<DisplaySection />
 			<WeatherSection />
+			<LocationSection />
 			<DaySection />
 			<InstallSection />
 			<DataSection />
@@ -250,6 +252,59 @@ function WeatherSection() {
 				</p>
 			) }
 			<p class="hint">{ t( 'settings.weather_source' ) }</p>
+		</section>
+	);
+}
+
+function LocationSection() {
+	const s = settings.value;
+	const [ message, setMessage ] = useState( '' );
+	// While the browser asks for permission, the box shows the requested state.
+	const [ asking, setAsking ] = useState( false );
+
+	const toggle = async ( on: boolean ) => {
+		setMessage( '' );
+		if ( ! on ) {
+			await save( { location_enabled: false } );
+			return;
+		}
+		// Asking here, from a tap, lets the browser show its permission prompt
+		// now instead of later on the writing screen.
+		setAsking( true );
+		setMessage( t( 'settings.here_getting' ) );
+		try {
+			await currentPosition( 0 );
+			await save( { location_enabled: true } );
+			setMessage( '' );
+		} catch {
+			setMessage( t( 'settings.location_denied' ) );
+		} finally {
+			setAsking( false );
+		}
+	};
+
+	return (
+		<section class="setting">
+			<h2>{ t( 'settings.location' ) }</h2>
+			{ canLocate() ? (
+				<label class="check">
+					<input
+						type="checkbox"
+						checked={ asking || s.location_enabled }
+						disabled={ asking }
+						onChange={ ( e ) => toggle( ( e.currentTarget as HTMLInputElement ).checked ) }
+					/>
+					{ t( 'settings.location_auto' ) }
+				</label>
+			) : (
+				<p class="hint">{ t( 'settings.here_unavailable' ) }</p>
+			) }
+			{ message && (
+				<p class="hint" role="status">
+					{ message }
+				</p>
+			) }
+			<p class="hint">{ t( 'settings.location_hint' ) }</p>
 		</section>
 	);
 }

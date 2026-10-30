@@ -142,6 +142,10 @@ class Hibi_Export {
 			$w      = $record['weather'];
 			$yaml[] = 'weather: { code: ' . (int) $w['weather_code'] . ', max: ' . ( null === $w['temp_max'] ? 'null' : $w['temp_max'] ) . ', min: ' . ( null === $w['temp_min'] ? 'null' : $w['temp_min'] ) . ', label: ' . self::yaml_string( (string) $w['label'] ) . ' }';
 		}
+		if ( ! empty( $record['location'] ) ) {
+			$l      = $record['location'];
+			$yaml[] = 'location: { lat: ' . (float) $l['lat'] . ', lng: ' . (float) $l['lng'] . ', label: ' . self::yaml_string( (string) $l['label'] ) . ' }';
+		}
 		$yaml[] = '---';
 
 		$body = rtrim( $record['content'] );
